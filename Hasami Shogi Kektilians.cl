@@ -19,3 +19,10 @@
                             ((= (+ n m) 0) (if   (atom (car mat))   (cons el (cdr mat))  (append (list (cons el (cdr (car mat)))) (cdr mat))))
                             ((= n 0) (if (listp (car mat)) (cons (postavi el n m (car mat)) (cdr mat)) (cons (car mat) (postavi el n (1- m) (cdr mat)))))
                             (t(cons (car mat) (postavi el (- n 1) m (cdr mat))))))
+							
+
+(defun potez (potez tabla) (let ((i1 (caar potez)) (j1 (cadar potez)) (i2 (caadr potez)) (j2 (car (cdr (car (cdr potez)))))) 
+                                                 (postavi '- i1 j1 (postavi (nth j1 (nth i1 tabla)) i2 j2 tabla)) ))
+												 
+												 
+												 
