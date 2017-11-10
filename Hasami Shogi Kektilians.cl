@@ -14,3 +14,8 @@
 (defun stampaj_tablu (tabla) (cond ((null tabla) '())
                                                 (t (progn (format t "~{~a ~}~%" (car tabla)) (stampaj_tablu (cdr tabla))))))
 
+												
+(defun postavi (el n m mat) (cond 
+                            ((= (+ n m) 0) (if   (atom (car mat))   (cons el (cdr mat))  (append (list (cons el (cdr (car mat)))) (cdr mat))))
+                            ((= n 0) (if (listp (car mat)) (cons (postavi el n m (car mat)) (cdr mat)) (cons (car mat) (postavi el n (1- m) (cdr mat)))))
+                            (t(cons (car mat) (postavi el (- n 1) m (cdr mat))))))
