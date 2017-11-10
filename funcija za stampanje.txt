@@ -1,0 +1,8 @@
+(defun stampaj_tablu (tabla)
+  (if (= (length tabla) n) (format t "~%"))
+  (cond                        
+                     ((null (cdr tabla)) (progn (format t "~{~a ~}" (car tabla)) (values)))
+                     (t (progn (format t "~{~a ~}~%" (car tabla)) (stampaj_tablu (cdr tabla))))
+                           
+                     )
+  )
