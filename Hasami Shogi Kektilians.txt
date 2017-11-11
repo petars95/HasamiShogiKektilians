@@ -25,4 +25,13 @@
                                                  (postavi '- i1 j1 (postavi (nth j1 (nth i1 tabla)) i2 j2 tabla)) ))
 												 
 												 
-												 
+(defun pobedaVert (tabla el dim n m count) (cond ((equal '0 count) T)
+                                                       ((and (equal '1 n) (equal '0 m)) '())
+                                                       ((equal '1 n) (pobedaVert tabla el dim (1- dim) (1- m) 5))
+                                                       (t (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth m (nth (1- n) tabla)))) 
+                                                              (pobedaVert tabla el dim (1- n) m (1- count)) 
+                                                              (pobedaVert tabla el dim (1- n) m count))) ))
+
+(defun pobedaVertX (tabla dim) (pobedaVert tabla 'x dim (1- dim) (1- dim) 5))
+
+(defun pobedaVertO (tabla dim) (pobedaVert (reverse tabla) 'O dim (1- dim) (1- dim) 5))												 
