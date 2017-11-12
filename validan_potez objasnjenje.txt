@@ -1,0 +1,7 @@
+Funkcija zabranaDijagonalno testira da li su unete vrednosti poteza validne, da li su unete vrednosti u granicama i da li se odigrava potez po horizontali/vertikali.
+
+Funkcije idiDesno, idiLevo, idiGore, idiDole proveravaju da li na zadatom putu od vrednosti p do k se ne nalazi nijedna figura.
+
+Funkcija validan_potez poziva gore navedenu funkciju za proveru, proverava da li je zadato polje p tog igraca koji trenutno igra i da li je krajne polje k prazno. Nakon toga
+odredjuje u kom pravcu treba da se odigra potez i proverava da li je mozda zadato preskakanje, ako jeste potez je valida, u suprotnom poziva se funkcija prethodno
+odredjenog pravca koja ce proveriti da li je potez validan.
