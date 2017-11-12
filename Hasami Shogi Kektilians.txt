@@ -39,16 +39,27 @@
 
 
 (defun pobedaSporednaDiag (tabla el dim n m count) 
-					(cond ((equal '0 count) el)
+					(cond ((equal '0 count) T)
                                               ((and (equal '2 n) (equal '3 m)) '())
                                               ((and (equal '1 n) (equal (1- dim) m)) (pobedaSporednaDiag tabla el dim 2 (- dim '2) 4))
-                                              ((and (< n dim) (< m dim) (> m '0)) (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth (1- m) (nth (1+ n) tabla))))                                                                                        (pobedaSporednaDiag tabla el dim (1+ n) (1- m) (1- count))
-                                                                                     (pobedaSporednaDiag tabla el dim (1+ n) (1- m) count)))
+                                              ((and (< n dim) (< m dim) (> m '0)) (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth (1- m) (nth (1+ n) tabla))))(pobedaSporednaDiag tabla el dim (1+ n) (1- m) (1- count))
+(pobedaSporednaDiag tabla el dim (1+ n) (1- m) 5)))
                                               ((< m '1) (pobedaSporednaDiag tabla el dim 2 (+ (- n 3) m) 4))
                                               (t (pobedaSporednaDiag tabla el dim m (1- n) 4) ) ))
 										 
 
+(defun okreni_po_vertikali (tabla) (cond ((null tabla) '())
+                                                      (t (cons (reverse (car tabla)) (okreni_po_vertikali (cdr tabla))))))
+
 (defun pobedaSporednaDiagX (tabla dim) (pobedaSporednaDiag tabla 'X dim (- dim 5) (- dim 1) 4))
 
+(defun pobedaGlavnaDiagX (tabla dim) (pobedaSporednaDiag (okreni_po_vertikali tabla) 'X dim (- dim 5) (- dim 1) 4))
+
 (defun pobedaGlavnaDiagO (tabla dim) (pobedaSporednaDiag (reverse tabla) 'O dim (- dim 5) (- dim 1) 4))
-											 
+
+(defun pobedaSporednaDiagO (tabla dim) (pobedaSporednaDiag (okreni_po_vertikali (reverse tabla)) 'O dim (- dim 5) (- dim 1) 4))
+
+
+(defun pobedaX (tabla dim) (if (or (pobedaVertX tabla dim) (pobedaSporednaDiagX tabla dim) (pobedaGlavnaDiagX tabla dim)) T '() ))
+
+(defun pobedaO (tabla dim) (if (or (pobedaVertO tabla dim) (pobedaSporednaDiagO tabla dim) (pobedaGlavnaDiagO tabla dim)) T '() ))
