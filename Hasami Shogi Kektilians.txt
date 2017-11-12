@@ -23,7 +23,18 @@
 
 (defun potez (potez tabla) (let ((i1 (caar potez)) (j1 (cadar potez)) (i2 (caadr potez)) (j2 (car (cdr (car (cdr potez)))))) 
                                                  (postavi '- i1 j1 (postavi (nth j1 (nth i1 tabla)) i2 j2 tabla)) ))
-												 
+
+(defun potez (potez tabla) (let ((i1 (caar potez)) (j1 (cadar potez)) (i2 (caadr potez)) (j2 (car (cdr (car (cdr potez)))))) 
+                                                 (if (validan_potez (car potez) (cadr potez) tabla trenutniIgrac) 
+                                                     (postavi '- i1 j1 (postavi (nth j1 (nth i1 tabla)) i2 j2 tabla)) 
+                                                     '()) ))
+
+(defun odigraj_prikazi (pot)
+  (progn (if (validan_potez (car pot) (cadr pot) stanje trenutniIgrac) 
+	     (setq stanje (potez pot stanje))) (stampaj_tablu stanje))
+ )
+
+											 
 												 
 (defun pobedaVert (tabla el dim n m count) (cond ((equal '0 count) T)
                                                        ((and (equal '1 n) (equal '0 m)) '())

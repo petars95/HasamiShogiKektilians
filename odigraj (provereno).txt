@@ -72,7 +72,7 @@
 )
 
 (defun idiDole (p k tabla)
-	(decf (car p))
+	(incf (car p))
 	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
 		(if (equal (car p) (car k))
 			t
