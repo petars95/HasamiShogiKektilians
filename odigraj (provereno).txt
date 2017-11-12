@@ -1,3 +1,36 @@
+(defun validan_potez (p k tabla trenutniIgrac)	
+	(if (null (zabranaDijagonalno p k)) '()
+		(if (equal trenutniIgrac (nth (cadr p) (nth (car p) tabla))) 
+			(if (equal (nth (cadr k) (nth (car k) tabla)) '-)
+				(if (< (cadr p) (cadr k))
+					(if (= (- (cadr k) (cadr p)) 2)
+						t
+						(if (idiDesno p k tabla) t '())
+					)
+					(if (> (cadr p) (cadr k))
+						(if (= (- (cadr p) (cadr k)) 2)
+							t
+							(if (idiLevo p k tabla) t '())
+						)
+						(if (< (car p) (car k))
+							(if (= (- (car k) (car p)) 2)
+								t
+								(if (idiDole p k tabla) t '())
+							)
+							(if (= (- (car p) (car k)) 2)
+								t
+								(if (idiGore p k tabla) t '())
+							)
+						)
+					)
+				)
+			'() )
+		'() )
+	)
+)
+
+
+
 (defun zabranaDijagonalno (p k)
     (if (and (< (car p) N)    (> (car p) '-1)    (< (car k) N)    (> (car k) '-1)    (< (cadr p) N)    (> (cadr p) '-1)    (< (cadr k) N)    (> (cadr k) '-1))        
         (cond ((and (= (car p) (car k)) (not (= (cadr p) (cadr k)))) t)
@@ -6,3 +39,54 @@
         )
     '() )
 )
+
+
+(defun idiDesno (p k tabla)
+	(incf (cadr p))
+	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
+		(if (equal (cadr p) (cadr k))
+			t
+			(idiDesno p k tabla) 
+		) 
+	'() ) 
+)
+
+(defun idiLevo (p k tabla)
+	(decf (cadr p))
+	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
+		(if (equal (cadr p) (cadr k))
+			t
+			(idiLevo p k tabla)
+		) 
+	'() ) 
+)
+
+(defun idiGore (p k tabla)
+	(decf (car p))
+	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
+		(if (equal (car p) (car k))
+			t
+			(idiGore p k tabla) 
+		) 
+	'() ) 
+)
+
+(defun idiDole (p k tabla)
+	(decf (car p))
+	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
+		(if (equal (car p) (car k))
+			t
+			(idiDole p k tabla)
+		) 
+	'() ) 
+)
+
+
+
+
+/////////////////////////////////////////////////////////
+;(defun idiDesno (tabla p k) (cond ((and (equal (cadr p) (1- (cadr k))) (equal (nth (1+ (cadr p)) (nth (car p) tabla)) '-)) t)
+                                               ;(t (if (equal (nth (1+ (cadr p)) (nth (car p) tabla)) '-) 
+                                                      ;(idiDesno tabla (list (car p) (1+ (cadr p))) k) 
+                                                      ';()) ) ))
+///////////////////////////////////////////////
