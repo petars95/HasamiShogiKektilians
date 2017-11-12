@@ -29,7 +29,7 @@
 	)
 )
 
-(defun (zabranaDijagonalno p k)
+(defun zabranaDijagonalno (p k)
 	(if ((= (car p) (car k)) and (not (= (cadr p) (cadr k))))
 		(if ((= (cdr p) (cdr k)) and (not (= (car p) (car k)))) 
 			(if (and (and (and (< (car p) N) (> (car p) 0)) (and (and (< (car k) N) (> (car k) 0)))) (and (and (< (cadr p) N) (> (cadr p) 0)) (and (and (< (cadr k) N) (> (cadr k) 0))))) (t) 
