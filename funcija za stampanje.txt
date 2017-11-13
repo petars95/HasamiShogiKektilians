@@ -52,12 +52,13 @@
 (defun odigraj_prikazi (pot)
   (progn (setq pom (copy-tree pot)) (values)) ;zauzima novo mesto u memoriji
   (if (validan_potez (car pom) (cadr pom) stanje) 
-      (setq stanje (potez (car pot) (cadr pot) stanje)) stanje)
+      (progn (setq stanje (potez (car pot) (cadr pot) stanje)) (pojedi (cadr pot))) 
+    stanje)
   (stampaj_tablu stanje)
       
 )
 
-//hasanje, treba jos par testa da se uradi i da se zove nakon sto se postavi stanje u funkciji odigraj_prikazi
+//hasanje, treba jos par testa da se uradi
 
 ;polje je oblika (x y)
 (defun pojedi (polje)
