@@ -10,8 +10,14 @@
 (defun napravi_tablu (n) (napravi_tablu1 n n))
 
 
-(defun stampaj_tablu (tabla) (cond ((null tabla) '())
-                                                (t (progn (format t "~{~a ~}~%" (car tabla)) (stampaj_tablu (cdr tabla))))))
+(defun stampaj_tablu (tabla)
+  (if (= (length tabla) n) (format t "~%"))
+  (cond                        
+                     ((null (cdr tabla)) (progn (format t "~{~a ~}" (car tabla)) (values)))
+                     (t (progn (format t "~{~a ~}~%" (car tabla)) (stampaj_tablu (cdr tabla))))
+                           
+                     )
+  )
 
 												
 (defun postavi (el n m mat) (cond 
@@ -22,15 +28,19 @@
 
 
 
-(defun potez (potez tabla) (let ((i1 (caar potez)) (j1 (cadar potez)) (i2 (caadr potez)) (j2 (car (cdr (car (cdr potez)))))) 
-                                                 (if (validan_potez (car potez) (cadr potez) tabla trenutniIgrac) 
-                                                     (postavi '- i1 j1 (postavi (nth j1 (nth i1 tabla)) i2 j2 tabla)) 
-                                                     '()) ))
+(defun potez (pot1 pot2 tabla)                                                 
+             (postavi '- (car pot1) (cadr pot1) (postavi trenutniigrac (car pot2) (cadr pot2) tabla))
+   )
+
 
 (defun odigraj_prikazi (pot)
-  (progn (if (validan_potez (car pot) (cadr pot) stanje trenutniIgrac) 
-	     (progn (setq stanje (potez pot stanje)) (if (equal trenutniIgrac 'x) (setq trenutniIgrac 'x) (setq trenutniIgrac 'o))) '()) (stampaj_tablu stanje))
- )
+  (progn (setq pom (copy-tree pot)) (values)) ;zauzima novo mesto u memoriji
+  (if (validan_potez (car pom) (cadr pom) stanje) 
+      (progn (setq stanje (potez (car pot) (cadr pot) stanje)) (pojedi (cadr pot))) 
+    stanje)
+  (stampaj_tablu stanje)
+      
+)
 
 											 
 												 
@@ -73,7 +83,7 @@
 
 (defun pobedaO (tabla dim) (if (or (pobedaVertO tabla dim) (pobedaSporednaDiagO tabla dim) (pobedaGlavnaDiagO tabla dim)) T '() ))
 
-(defun validan_potez (p k tabla trenutniIgrac)	
+(defun validan_potez (p k tabla)	
 	(if (null (zabranaDijagonalno p k)) '()
 		(if (equal trenutniIgrac (nth (cadr p) (nth (car p) tabla))) 
 			(if (equal (nth (cadr k) (nth (car k) tabla)) '-)
@@ -104,6 +114,22 @@
 	)
 )
 
+(defun preostalih (tabla el) (cond ((null tabla) '0)
+                                               ((listp (car tabla)) (+ (preostalih (car tabla) el) (preostalih (cdr tabla) el)) )
+                                               ((equal el (car tabla)) (1+ (preostalih (cdr tabla) el)))
+                                               (t (preostalih (cdr tabla) el) )))
+
+
+(defun manje_od_4_x (tabla) (if (< (preostalih tabla 'x) 4) t '()))
+
+
+(defun manje_od_4_o (tabla) (if (< (preostalih tabla 'o) 4) t '()))
+
+
+
+(defun pobedaX (tabla dim) (if (or (pobedaVertX tabla dim) (pobedaSporednaDiagX tabla dim) (pobedaGlavnaDiagX tabla dim) (manje_od_4_o tabla)) T '() ))
+
+(defun pobedaO (tabla dim) (if (or (pobedaVertO tabla dim) (pobedaSporednaDiagO tabla dim) (pobedaGlavnaDiagO tabla dim) (manje_od_4_x tabla)) T '() ))
 
 
 (defun zabranaDijagonalno (p k)
@@ -155,3 +181,66 @@
 		) 
 	'() ) 
 )
+
+;polje je oblika (x y)
+(defun pojedi (polje)
+  (progn (eatleft polje 1) (eatright polje 1) (eatup polje 1) (eatdown polje 1) (values))
+)
+  
+(defun eatleft (polje smer)
+  (cond
+   ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
+   ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatleft (list (car polje) (+ (cadr polje) 1)) 0)))
+   ((equal 0 (cadr polje)) '(kraj table))
+   ((equal '- (nth (- (cadr polje) 1) (nth (car polje) stanje))) '(crtica je))
+   ((equal netrenutniigrac (nth (- (cadr polje) 1) (nth (car polje) stanje))) (eatleft (list (car polje) (- (cadr polje) 1)) 1))
+   ((equal trenutniigrac (nth (- (cadr polje) 1) (nth (car polje) stanje)))  (eatleft (list (car polje) (cadr polje) ) 0))
+   (t '(nesto ne valja))
+   
+   )
+  
+  )
+
+  
+(defun eatright (polje smer)
+  (cond
+   ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
+   ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatright (list (car polje) (- (cadr polje) 1)) 0)))
+   ((equal 8 (cadr polje)) '(kraj table))
+   ((equal '- (nth (+ (cadr polje) 1) (nth (car polje) stanje))) '(crtica je))
+   ((equal netrenutniigrac (nth (+ (cadr polje) 1) (nth (car polje) stanje))) (eatright (list (car polje) (+ (cadr polje) 1)) 1))
+   ((equal trenutniigrac (nth (+ (cadr polje) 1) (nth (car polje) stanje)))  (eatright (list (car polje) (cadr polje) ) 0))
+   (t '(nesto ne valja))
+   
+   )
+  
+  )
+
+(defun eatup (polje smer)
+  (cond
+   ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
+   ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatup (list (+ (car polje) 1) (cadr polje)) 0)))
+   ((equal 0 (car polje)) '(kraj table))
+   ((equal '- (nth (cadr polje) (nth (- (car polje) 1) stanje))) '(crtica je))
+   ((equal netrenutniigrac (nth (cadr polje) (nth (- (car polje) 1) stanje))) (eatup (list (- (car polje) 1) (cadr polje) ) 1))
+   ((equal trenutniigrac (nth (cadr polje) (nth (- (car polje) 1) stanje)))  (eatup (list (car polje) (cadr polje) ) 0))
+   (t '(nesto ne valja))
+   
+   )
+  
+  )
+
+(defun eatdown (polje smer)
+  (cond
+   ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
+   ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatdown (list (- (car polje) 1) (cadr polje)) 0)))
+   ((equal 8 (car polje)) '(kraj table))
+   ((equal '- (nth (cadr polje) (nth (+ (car polje) 1) stanje))) '(crtica je))
+   ((equal netrenutniigrac (nth (cadr polje) (nth (+ (car polje) 1) stanje))) (eatdown (list (+ (car polje) 1) (cadr polje) ) 1))
+   ((equal trenutniigrac (nth (cadr polje) (nth (+ (car polje) 1) stanje)))  (eatdown (list (car polje) (cadr polje) ) 0))
+   (t '(nesto ne valja))
+   
+   )
+  
+  )
+
