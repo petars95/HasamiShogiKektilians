@@ -1,3 +1,16 @@
+;Globalne promenljive:
+; realn - dimenzija table
+; stanje - trenutno stanje table
+; trenutniigrac, netrenutni igrac - x ili o
+;
+;
+;
+;
+;
+;
+;
+;
+
 (defun napravi_vrstu (dim el) (cond ((equal dim '0) '())
                                              (t (cons el (napravi_vrstu (1- dim) el)))))
 
@@ -215,7 +228,7 @@
   (cond
    ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
    ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatright (list (car polje) (- (cadr polje) 1)) 0)))
-   ((equal 8 (cadr polje)) '(kraj table))
+   ((equal (1- realn)  (cadr polje)) '(kraj table))
    ((equal '- (nth (+ (cadr polje) 1) (nth (car polje) stanje))) '(crtica je))
    ((equal netrenutniigrac (nth (+ (cadr polje) 1) (nth (car polje) stanje))) (eatright (list (car polje) (+ (cadr polje) 1)) 1))
    ((equal trenutniigrac (nth (+ (cadr polje) 1) (nth (car polje) stanje)))  (eatright (list (car polje) (cadr polje) ) 0))
@@ -243,7 +256,7 @@
   (cond
    ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
    ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatdown (list (- (car polje) 1) (cadr polje)) 0)))
-   ((equal 8 (car polje)) '(kraj table))
+   ((equal (1- realn) (car polje)) '(kraj table))
    ((equal '- (nth (cadr polje) (nth (+ (car polje) 1) stanje))) '(crtica je))
    ((equal netrenutniigrac (nth (cadr polje) (nth (+ (car polje) 1) stanje))) (eatdown (list (+ (car polje) 1) (cadr polje) ) 1))
    ((equal trenutniigrac (nth (cadr polje) (nth (+ (car polje) 1) stanje)))  (eatdown (list (car polje) (cadr polje) ) 0))
@@ -264,6 +277,7 @@
  (stampaj_tablu stanje)  
            )
   )
+
 
 
 
