@@ -38,7 +38,7 @@
 
 
 (defun potez (pot1 pot2 tabla)                                                 
-             (postavi '- (car pot1) (cadr pot1) (postavi trenutniigrac (car pot2) (cadr pot2) tabla))
+             (postavi '- (car pot1) (cadr pot1) (postavi (nth (cadr pot1) (nth (car pot1) tabla)) (car pot2) (cadr pot2) tabla))
    )
 
 
@@ -273,6 +273,13 @@
            )
   )
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 2. FAZA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+(defun napravi_novo_stanje (tabla potez) (if (validan_potez (car potez) (cadr potez) tabla) (potez (car potez) (cadr potez) tabla)))
 
 
 
