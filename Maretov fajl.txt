@@ -90,3 +90,65 @@
                                                       ;(idiDesno tabla (list (car p) (1+ (cadr p))) k) 
                                                       ';()) ) ))
 ///////////////////////////////////////////////
+
+
+PROBA PROBA
+-----------------------------------------------
+(defun lista_mogucih_poteza (tabla i j igrac)
+	(cond
+		((equal i realN) '())
+		((not (equal igrac (nth j (nth i tabla))))
+			(if (equal (+1 j) (realN))
+				(lista_mogucih_poteza (1+ i) 0)
+				(lista_mogucih_poteza i (1+ j))
+			)
+		)
+		(t (append (proveri_okolne_poteze tabla i j igrac 0 0) (if (equal (1+ j) (realN)) (lista_mogucih_poteza (1+ i) 0) (lista_mogucih_poteza i (1+ j)))))
+	)
+)
+
+(defun proveri_okolne_poteze (tabla i j igrac i2 j2)
+	(cond 
+		((equal i2 realN) '())
+		((if (equal j2 realN)
+			(if (validan_potez tabla (list i j) (list i2 j) tabla)
+				(append (list i2 j) (proveri_okolne_poteze tabla i j igrac (1+ i2) j))
+				(proveri_okolne_poteze tabla i j igrac (1+ i2) j)
+			)
+			(if (validan_potez tabla (list i j) (list i j2) tabla)
+				(append (list i j2) (proveri_okolne_poteze tabla i j igrac i (1+ j2)))
+				(proveri_okolne_poteze tabla i j igrac i (1+ j2))
+		)))
+	)
+)
+
+(defun validan_potez (p k tabla igrac)	
+	(if (null (zabranaDijagonalno p k)) '()
+		(if (equal igrac (nth (cadr p) (nth (car p) tabla))) 
+			(if (equal (nth (cadr k) (nth (car k) tabla)) '-)
+				(if (< (cadr p) (cadr k))
+					(if (= (- (cadr k) (cadr p)) 2)
+						t
+						(if (idiDesno (list (car p) (1+ (cadr p))) k tabla) t '())
+					)
+					(if (> (cadr p) (cadr k))
+						(if (= (- (cadr p) (cadr k)) 2)
+							t
+							(if (idiLevo (list (car p) (1- (cadr p))) k tabla) t '())
+						)
+						(if (< (car p) (car k))
+							(if (= (- (car k) (car p)) 2)
+								t
+								(if (idiDole (list (1+ (car p)) (cadr p)) k tabla) t '())
+							)
+							(if (= (- (car p) (car k)) 2)
+								t
+								(if (idiGore (list (1- (car p)) (cadr p)) k tabla) t '())
+							)
+						)
+					)
+				)
+			'() )
+		'() )
+	)
+)
