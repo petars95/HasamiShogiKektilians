@@ -43,8 +43,8 @@
 
 
 (defun odigraj_prikazi (pot)
-  (progn (setq pom (copy-tree pot)) (values)) ;zauzima novo mesto u memoriji
-  (if (validan_potez (car pom) (cadr pom) stanje)
+  ;(progn (setq pom (copy-tree pot)) (values)) ;zauzima novo mesto u memoriji
+  (if (validan_potez (car pot) (cadr pot) stanje)
       ;then
       (progn 
               (setq stanje (potez (car pot) (cadr pot) stanje)) 
@@ -109,21 +109,21 @@
 				(if (< (cadr p) (cadr k))
 					(if (= (- (cadr k) (cadr p)) 2)
 						t
-						(if (idiDesno p k tabla) t '())
+						(if (idiDesno (list (car p) (1+ (cadr p))) k tabla) t '())
 					)
 					(if (> (cadr p) (cadr k))
 						(if (= (- (cadr p) (cadr k)) 2)
 							t
-							(if (idiLevo p k tabla) t '())
+							(if (idiLevo (list (car p) (1- (cadr p))) k tabla) t '())
 						)
 						(if (< (car p) (car k))
 							(if (= (- (car k) (car p)) 2)
 								t
-								(if (idiDole p k tabla) t '())
+								(if (idiDole (list (1+ (car p)) (cadr p)) k tabla) t '())
 							)
 							(if (= (- (car p) (car k)) 2)
 								t
-								(if (idiGore p k tabla) t '())
+								(if (idiGore (list (1- (car p)) (cadr p)) k tabla) t '())
 							)
 						)
 					)
@@ -164,41 +164,37 @@
 
 
 (defun idiDesno (p k tabla)
-	(incf (cadr p))
 	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
 		(if (equal (cadr p) (cadr k))
 			t
-			(idiDesno p k tabla) 
+			(idiDesno (list (car p) (1+ (cadr p))) k tabla) 
 		) 
 	'() ) 
-)
+  )
 
 (defun idiLevo (p k tabla)
-	(decf (cadr p))
 	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
 		(if (equal (cadr p) (cadr k))
 			t
-			(idiLevo p k tabla)
+			(idiLevo (list (car p) (1- (cadr p))) k tabla)
 		) 
 	'() ) 
 )
 
 (defun idiGore (p k tabla)
-	(decf (car p))
 	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
 		(if (equal (car p) (car k))
 			t
-			(idiGore p k tabla) 
+			(idiGore (list (1- (car p)) (cadr p)) k tabla) 
 		) 
 	'() ) 
 )
 
 (defun idiDole (p k tabla)
-	(incf (car p))
 	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
 		(if (equal (car p) (car k))
 			t
-			(idiDole p k tabla)
+			(idiDole (list (1+ (car p)) (cadr p)) k tabla)
 		) 
 	'() ) 
 )
@@ -283,6 +279,33 @@
 // test code
 
 (nova 9)
+
+
+;proba partije
+
+(odigraj_prikazi '((1 4) (3 4)))
+(odigraj_prikazi '((7 5) (4 5)))
+
+(odigraj_prikazi '((0 4) (2 4)))
+(odigraj_prikazi '((4 5) (3 5)))
+
+(odigraj_prikazi '((2 4) (4 4)))
+(odigraj_prikazi '((7 6) (3 6)))
+
+(odigraj_prikazi '((1 7) (3 7)))
+(odigraj_prikazi '((8 3) (6 3)))
+
+(odigraj_prikazi '((1 5) (5 5)))
+(odigraj_prikazi '((7 1) (6 1)))
+
+(odigraj_prikazi '((1 3) (3 3)))
+(odigraj_prikazi '((6 1) (7 1)))
+
+(odigraj_prikazi '((1 2) (2 2)))
+(odigraj_prikazi '((7 1) (6 1)))
+
+(odigraj_prikazi '((1 6) (6 6)))
+(odigraj_prikazi '((6 1) (7 1)))
 
 ;xpotezi
 
