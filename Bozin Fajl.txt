@@ -196,6 +196,34 @@
 	'() ) 
 )
 
+(defun lista_mogucih_poteza (tabla i j igrac)
+	(cond
+		((equal i realN) '())
+		((not (equal igrac (nth j (nth i tabla))))
+			(if (equal (1+ j) realN)
+				(lista_mogucih_poteza tabla (1+ i) j igrac)
+				(lista_mogucih_poteza tabla i (1+ j) igrac)
+			)
+		)
+		(t (append (proveri_okolne_poteze tabla i j igrac '0 '0) (if (equal (1+ j) realN) (lista_mogucih_poteza tabla (1+ i) 0 igrac) (lista_mogucih_poteza tabla i (1+ j) igrac))))
+	)
+)
+
+(defun proveri_okolne_poteze (tabla i j igrac i2 j2)
+	(cond 
+		((equal i2 realN) '())
+		(t (if (equal j2 realN)
+			(if (validan_potez (list i j) (list i2 j) tabla igrac)
+				(append (list (append (list (list i j)) (list (list i2 j)))) (proveri_okolne_poteze tabla i j igrac (1+ i2) j2))
+				(proveri_okolne_poteze tabla i j igrac (1+ i2) j2)
+			)
+			(if (validan_potez (list i j) (list i j2) tabla igrac)
+				(append (list (append (list (list i j)) (list (list i j2)))) (proveri_okolne_poteze tabla i j igrac i2 (1+ j2)))
+				(proveri_okolne_poteze tabla i j igrac i2 (1+ j2))
+		)))
+	)
+)
+
 ;polje je oblika (x y)
 
 (defun pojedi (polje tabla igrac) (eatleft polje 1 (eatright polje 1 (eatup polje 1 (eatdown polje 1 tabla igrac) igrac) igrac) igrac))
