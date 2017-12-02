@@ -78,13 +78,16 @@
 (defun pobedaVertO (tabla) (pobedaVert (reverse tabla) 'O (1- realn) (1- realn) 4))	
 
 
+;formatirana funkcija da je allegro lepo prepozna 02.12.2017. 18:41
 (defun pobedaSporednaDiag (tabla el n m count) 
-					(cond ((equal '0 count) T)
-                                              ((and (equal '2 n) (equal '3 m)) '())
-                                              ((and (equal '1 n) (equal (1- realn) m)) (pobedaSporednaDiag tabla el 2 (- realn '2) 4))
-                                              ((and (< n realn) (< m realn) (> m '0)) (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth (1- m) (nth (1+ n) tabla))))(pobedaSporednaDiag tabla el (1+ n) (1- m) (1- count))(pobedaSporednaDiag tabla el (1+ n) (1- m) 5)))
-                                              ((< m '1) (pobedaSporednaDiag tabla el 2 (+ (- n 3) m) 4))
-                                              (t (pobedaSporednaDiag tabla el m (1- n) 4) ) ))
+	(cond ((equal '0 count) T)
+		((and (equal '2 n) (equal '3 m)) '())
+		((and (equal '1 n) (equal (1- realn) m)) (pobedaSporednaDiag tabla el 2 (- realn '2) 4))
+		((and (< n realn) (< m realn) (> m '0)) (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth (1- m) (nth (1+ n) tabla))))
+							    (pobedaSporednaDiag tabla el (1+ n) (1- m) (1- count))
+							    (pobedaSporednaDiag tabla el (1+ n) (1- m) 5)))
+		((< m '1) (pobedaSporednaDiag tabla el 2 (+ (- n 3) m) 4))
+		(t (pobedaSporednaDiag tabla el m (1- n) 4) ) ))
 										 
 
 (defun okreni_po_vertikali (tabla) (cond ((null tabla) '())
