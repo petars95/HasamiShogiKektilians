@@ -37,18 +37,17 @@
 
 
 
-(defun potez (pot1 pot2 tabla)                                                 
-             (postavi '- (car pot1) (cadr pot1) (postavi (nth (cadr pot1) (nth (car pot1) tabla)) (car pot2) (cadr pot2) tabla))
-   )
+(defun potez (pot1 pot2 tabla igrac)                                                 
+             (pojedi pot2 (postavi '- (car pot1) (cadr pot1) (postavi (nth (cadr pot1) (nth (car pot1) tabla)) (car pot2) (cadr pot2) tabla)) igrac)
+  )
 
 
 (defun odigraj_prikazi (pot)
   ;(progn (setq pom (copy-tree pot)) (values)) ;zauzima novo mesto u memoriji
-  (if (validan_potez (car pot) (cadr pot) stanje)
+  (if (validan_potez (car pot) (cadr pot) stanje trenutniigrac)
       ;then
       (progn 
-              (setq stanje (potez (car pot) (cadr pot) stanje)) 
-              (pojedi (cadr pot))                                   
+              (setq stanje (potez (car pot) (cadr pot) stanje trenutniigrac))                                
               (stampaj_tablu stanje)
               (if (pobeda stanje) (format t "~%~%pobednik je ~a" trenutniigrac))
               (if (equal trenutniigrac 'o)
@@ -58,9 +57,7 @@
               (values)
         )
       ;else
-     '(nevalidan potez))
-  
-      
+     '())     
 )
 
 											 
@@ -102,9 +99,9 @@
 (defun pobedaSporednaDiagO (tabla) (pobedaSporednaDiag (okreni_po_vertikali (reverse tabla)) 'O  (- realn 5) (- realn 1) 4))
 
 
-(defun validan_potez (p k tabla)	
+(defun validan_potez (p k tabla igrac)	
 	(if (null (zabranaDijagonalno p k)) '()
-		(if (equal trenutniIgrac (nth (cadr p) (nth (car p) tabla))) 
+		(if (equal igrac (nth (cadr p) (nth (car p) tabla))) 
 			(if (equal (nth (cadr k) (nth (car k) tabla)) '-)
 				(if (< (cadr p) (cadr k))
 					(if (= (- (cadr k) (cadr p)) 2)
@@ -200,67 +197,60 @@
 )
 
 ;polje je oblika (x y)
-(defun pojedi (polje)
-  (progn (eatleft polje 1) (eatright polje 1) (eatup polje 1) (eatdown polje 1) (values))
+
+(defun pojedi (polje tabla igrac) (eatleft polje 1 (eatright polje 1 (eatup polje 1 (eatdown polje 1 tabla igrac) igrac) igrac) igrac))
+
+
+(defun eatleft (polje smer tabla igrac)
+  (cond
+   ((and (equal smer 0) (equal igrac (nth (cadr polje) (nth (car polje) tabla)))) tabla)
+   ((equal smer 0) (eatleft (list (car polje) (+ (cadr polje) 1)) 0 (postavi '- (car polje) (cadr polje) tabla) igrac))
+   ((equal 0 (cadr polje)) tabla)
+   ((equal '- (nth (- (cadr polje) 1) (nth (car polje) tabla))) tabla)
+   ((equal (suprotni_igrac igrac) (nth (- (cadr polje) 1) (nth (car polje) tabla))) (eatleft (list (car polje) (- (cadr polje) 1)) 1 tabla igrac))
+   ((equal igrac (nth (- (cadr polje) 1) (nth (car polje) tabla)))  (eatleft (list (car polje) (cadr polje) ) 0 tabla igrac))
+   (t '(nesto ne valja))   
+   )
 )
-  
-(defun eatleft (polje smer)
-  (cond
-   ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
-   ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatleft (list (car polje) (+ (cadr polje) 1)) 0)))
-   ((equal 0 (cadr polje)) '(kraj table))
-   ((equal '- (nth (- (cadr polje) 1) (nth (car polje) stanje))) '(crtica je))
-   ((equal netrenutniigrac (nth (- (cadr polje) 1) (nth (car polje) stanje))) (eatleft (list (car polje) (- (cadr polje) 1)) 1))
-   ((equal trenutniigrac (nth (- (cadr polje) 1) (nth (car polje) stanje)))  (eatleft (list (car polje) (cadr polje) ) 0))
-   (t '(nesto ne valja))
-   
-   )
-  
-  )
 
-  
-(defun eatright (polje smer)
+(defun eatright (polje smer tabla igrac)
   (cond
-   ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
-   ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatright (list (car polje) (- (cadr polje) 1)) 0)))
-   ((equal (1- realn)  (cadr polje)) '(kraj table))
-   ((equal '- (nth (+ (cadr polje) 1) (nth (car polje) stanje))) '(crtica je))
-   ((equal netrenutniigrac (nth (+ (cadr polje) 1) (nth (car polje) stanje))) (eatright (list (car polje) (+ (cadr polje) 1)) 1))
-   ((equal trenutniigrac (nth (+ (cadr polje) 1) (nth (car polje) stanje)))  (eatright (list (car polje) (cadr polje) ) 0))
-   (t '(nesto ne valja))
-   
-   )
-  
-  )
+   ((and (equal smer 0) (equal igrac (nth (cadr polje) (nth (car polje) tabla)))) tabla)
+   ((equal smer 0) (eatright (list (car polje) (- (cadr polje) 1)) 0 (postavi '- (car polje) (cadr polje) tabla) igrac))
+   ((equal (1- realn)  (cadr polje)) tabla)
+   ((equal '- (nth (+ (cadr polje) 1) (nth (car polje) tabla))) tabla)
+   ((equal (suprotni_igrac igrac) (nth (+ (cadr polje) 1) (nth (car polje) tabla))) (eatright (list (car polje) (+ (cadr polje) 1)) 1 tabla igrac))
+   ((equal igrac (nth (+ (cadr polje) 1) (nth (car polje) tabla)))  (eatright (list (car polje) (cadr polje) ) 0 tabla igrac))
+   (t '(nesto ne valja))  
+  )  
+)
 
-(defun eatup (polje smer)
+(defun eatup (polje smer tabla igrac)
   (cond
-   ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
-   ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatup (list (+ (car polje) 1) (cadr polje)) 0)))
-   ((equal 0 (car polje)) '(kraj table))
-   ((equal '- (nth (cadr polje) (nth (- (car polje) 1) stanje))) '(crtica je))
-   ((equal netrenutniigrac (nth (cadr polje) (nth (- (car polje) 1) stanje))) (eatup (list (- (car polje) 1) (cadr polje) ) 1))
-   ((equal trenutniigrac (nth (cadr polje) (nth (- (car polje) 1) stanje)))  (eatup (list (car polje) (cadr polje) ) 0))
-   (t '(nesto ne valja))
-   
-   )
-  
-  )
+   ((and (equal smer 0) (equal igrac (nth (cadr polje) (nth (car polje) tabla)))) tabla)
+   ((equal smer 0) (eatup (list (+ (car polje) 1) (cadr polje)) 0 (postavi '- (car polje) (cadr polje) tabla) igrac))
+   ((equal 0 (car polje)) tabla)
+   ((equal '- (nth (cadr polje) (nth (- (car polje) 1) tabla))) tabla)
+   ((equal (suprotni_igrac igrac) (nth (cadr polje) (nth (- (car polje) 1) tabla))) (eatup (list (- (car polje) 1) (cadr polje) ) 1 tabla igrac))
+   ((equal igrac (nth (cadr polje) (nth (- (car polje) 1) tabla)))  (eatup (list (car polje) (cadr polje) ) 0 tabla igrac))
+   (t '(nesto ne valja))  
+  )  
+)
 
-(defun eatdown (polje smer)
+(defun eatdown (polje smer tabla igrac)
   (cond
-   ((and (equal smer 0) (equal trenutniigrac (nth (cadr polje) (nth (car polje) stanje)))) '(uspesno svrseno))
-   ((equal smer 0) (progn (setq stanje (postavi '- (car polje) (cadr polje) stanje)) (eatdown (list (- (car polje) 1) (cadr polje)) 0)))
-   ((equal (1- realn) (car polje)) '(kraj table))
-   ((equal '- (nth (cadr polje) (nth (+ (car polje) 1) stanje))) '(crtica je))
-   ((equal netrenutniigrac (nth (cadr polje) (nth (+ (car polje) 1) stanje))) (eatdown (list (+ (car polje) 1) (cadr polje) ) 1))
-   ((equal trenutniigrac (nth (cadr polje) (nth (+ (car polje) 1) stanje)))  (eatdown (list (car polje) (cadr polje) ) 0))
-   (t '(nesto ne valja))
-   
-   )
-  
-  )
+   ((and (equal smer 0) (equal igrac (nth (cadr polje) (nth (car polje) tabla)))) tabla)
+   ((equal smer 0) (eatdown (list (- (car polje) 1) (cadr polje)) 0 (postavi '- (car polje) (cadr polje) tabla) igrac))
+   ((equal (1- realn) (car polje)) tabla)
+   ((equal '- (nth (cadr polje) (nth (+ (car polje) 1) tabla))) tabla)
+   ((equal (suprotni_igrac igrac) (nth (cadr polje) (nth (+ (car polje) 1) tabla))) (eatdown (list (+ (car polje) 1) (cadr polje) ) 1 tabla igrac))
+   ((equal igrac (nth (cadr polje) (nth (+ (car polje) 1) tabla)))  (eatdown (list (car polje) (cadr polje) ) 0 tabla igrac))
+   (t '(nesto ne valja))   
+  )  
+)
 
+
+(defun suprotni_igrac (igrac) (if (equal igrac 'X) 'O 'X))
 
 
 (defun nova (dim)
@@ -271,7 +261,7 @@
  (setq netrenutniigrac 'o)
  (stampaj_tablu stanje)  
            )
-  )
+)
 
 
 
