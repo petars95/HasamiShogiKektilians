@@ -1,0 +1,69 @@
+(defun idiDesno (p k tabla)
+	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
+		(if (equal (cadr p) (cadr k))
+			t
+			(idiDesno (list (car p) (1+ (cadr p))) k tabla) 
+		) 
+	'() ) 
+  )
+
+(defun idiLevo (p k tabla)
+	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
+		(if (equal (cadr p) (cadr k))
+			t
+			(idiLevo (list (car p) (1- (cadr p))) k tabla)
+		) 
+	'() ) 
+)
+
+(defun idiGore (p k tabla)
+	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
+		(if (equal (car p) (car k))
+			t
+			(idiGore (list (1- (car p)) (cadr p)) k tabla) 
+		) 
+	'() ) 
+)
+
+(defun idiDole (p k tabla)
+	(if (equal (nth (cadr p) (nth (car p) tabla)) '-)
+		(if (equal (car p) (car k))
+			t
+			(idiDole (list (1+ (car p)) (cadr p)) k tabla)
+		) 
+	'() ) 
+)
+
+(defun validan_potez (p k tabla)	
+	(if (null (zabranaDijagonalno p k)) '()
+		(if (equal trenutniIgrac (nth (cadr p) (nth (car p) tabla))) 
+			(if (equal (nth (cadr k) (nth (car k) tabla)) '-)
+				(if (< (cadr p) (cadr k))
+					(if (= (- (cadr k) (cadr p)) 2)
+						t
+						(if (idiDesno (list (car p) (1+ (cadr p))) k tabla) t '())
+					)
+					(if (> (cadr p) (cadr k))
+						(if (= (- (cadr p) (cadr k)) 2)
+							t
+							(if (idiLevo (list (car p) (1- (cadr p))) k tabla) t '())
+						)
+						(if (< (car p) (car k))
+							(if (= (- (car k) (car p)) 2)
+								t
+								(if (idiDole (list (1+ (car p)) (cadr p)) k tabla) t '())
+							)
+							(if (= (- (car p) (car k)) 2)
+								t
+								(if (idiGore (list (1- (car p)) (cadr p)) k tabla) t '())
+							)
+						)
+					)
+				)
+			'() )
+		'() )
+	)
+)
+
+
+
