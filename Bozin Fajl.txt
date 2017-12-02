@@ -1,15 +1,12 @@
 ;Globalne promenljive:
 ; realn - dimenzija table
 ; stanje - trenutno stanje table
-; trenutniigrac, netrenutni igrac - x ili o
+; trenutniigrac, netrenutniigrac - x ili o
 ;
 ;
 ;
 ;
-;
-;
-;
-;
+
 
 (defun napravi_vrstu (dim el) (cond ((equal dim '0) '())
                                              (t (cons el (napravi_vrstu (1- dim) el)))))
@@ -51,12 +48,14 @@
       ;then
       (progn 
               (setq stanje (potez (car pot) (cadr pot) stanje)) 
-              (pojedi (cadr pot))
+              (pojedi (cadr pot))                                   
+              (stampaj_tablu stanje)
+              (if (pobeda stanje) (format t "~%~%pobednik je ~a" trenutniigrac))
               (if (equal trenutniigrac 'o)
                      (progn (setq trenutniigrac 'x) (setq netrenutniigrac 'o))
                      (progn (setq trenutniigrac 'o) (setq netrenutniigrac 'x))                          
                 )
-              (stampaj_tablu stanje)
+              (values)
         )
       ;else
      '(nevalidan potez))
@@ -66,44 +65,39 @@
 
 											 
 												 
-(defun pobedaVert (tabla el dim n m count) (cond ((equal '0 count) T)
+(defun pobedaVert (tabla el n m count) (cond ((equal '0 count) T)
                                                        ((and (equal '1 n) (equal '0 m)) '())
-                                                       ((equal '1 n) (pobedaVert tabla el dim (1- dim) (1- m) 5))
+                                                       ((equal '1 n) (pobedaVert tabla el (1- realn) (1- m) 4))
                                                        (t (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth m (nth (1- n) tabla)))) 
-                                                              (pobedaVert tabla el dim (1- n) m (1- count)) 
-                                                              (pobedaVert tabla el dim (1- n) m count))) ))
+                                                              (pobedaVert tabla el (1- n) m (1- count)) 
+                                                              (pobedaVert tabla el (1- n) m count))) ))
 
 
-(defun pobedaVertX (tabla dim) (pobedaVert tabla 'x dim (1- dim) (1- dim) 5))
+(defun pobedaVertX (tabla) (pobedaVert tabla 'x  (1- realn) (1- realn) 4))
 
-(defun pobedaVertO (tabla dim) (pobedaVert (reverse tabla) 'O dim (1- dim) (1- dim) 5))	
+(defun pobedaVertO (tabla) (pobedaVert (reverse tabla) 'O (1- realn) (1- realn) 4))	
 
 
-(defun pobedaSporednaDiag (tabla el dim n m count) 
+(defun pobedaSporednaDiag (tabla el n m count) 
 					(cond ((equal '0 count) T)
                                               ((and (equal '2 n) (equal '3 m)) '())
-                                              ((and (equal '1 n) (equal (1- dim) m)) (pobedaSporednaDiag tabla el dim 2 (- dim '2) 4))
-                                              ((and (< n dim) (< m dim) (> m '0)) (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth (1- m) (nth (1+ n) tabla))))(pobedaSporednaDiag tabla el dim (1+ n) (1- m) (1- count))
-(pobedaSporednaDiag tabla el dim (1+ n) (1- m) 5)))
-                                              ((< m '1) (pobedaSporednaDiag tabla el dim 2 (+ (- n 3) m) 4))
-                                              (t (pobedaSporednaDiag tabla el dim m (1- n) 4) ) ))
+                                              ((and (equal '1 n) (equal (1- realn) m)) (pobedaSporednaDiag tabla el 2 (- realn '2) 4))
+                                              ((and (< n realn) (< m realn) (> m '0)) (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth (1- m) (nth (1+ n) tabla))))(pobedaSporednaDiag tabla el (1+ n) (1- m) (1- count))(pobedaSporednaDiag tabla el (1+ n) (1- m) 5)))
+                                              ((< m '1) (pobedaSporednaDiag tabla el 2 (+ (- n 3) m) 4))
+                                              (t (pobedaSporednaDiag tabla el m (1- n) 4) ) ))
 										 
 
 (defun okreni_po_vertikali (tabla) (cond ((null tabla) '())
                                                       (t (cons (reverse (car tabla)) (okreni_po_vertikali (cdr tabla))))))
 
-(defun pobedaSporednaDiagX (tabla dim) (pobedaSporednaDiag tabla 'X dim (- dim 5) (- dim 1) 4))
+(defun pobedaSporednaDiagX (tabla) (pobedaSporednaDiag tabla 'X  (- realn 5) (- realn 1) 4))
 
-(defun pobedaGlavnaDiagX (tabla dim) (pobedaSporednaDiag (okreni_po_vertikali tabla) 'X dim (- dim 5) (- dim 1) 4))
+(defun pobedaGlavnaDiagX (tabla) (pobedaSporednaDiag (okreni_po_vertikali tabla) 'X  (- realn 5) (- realn 1) 4))
 
-(defun pobedaGlavnaDiagO (tabla dim) (pobedaSporednaDiag (reverse tabla) 'O dim (- dim 5) (- dim 1) 4))
+(defun pobedaGlavnaDiagO (tabla) (pobedaSporednaDiag (reverse tabla) 'O  (- realn 5) (- realn 1) 4))
 
-(defun pobedaSporednaDiagO (tabla dim) (pobedaSporednaDiag (okreni_po_vertikali (reverse tabla)) 'O dim (- dim 5) (- dim 1) 4))
+(defun pobedaSporednaDiagO (tabla) (pobedaSporednaDiag (okreni_po_vertikali (reverse tabla)) 'O  (- realn 5) (- realn 1) 4))
 
-
-(defun pobedaX (tabla dim) (if (or (pobedaVertX tabla dim) (pobedaSporednaDiagX tabla dim) (pobedaGlavnaDiagX tabla dim)) T '() ))
-
-(defun pobedaO (tabla dim) (if (or (pobedaVertO tabla dim) (pobedaSporednaDiagO tabla dim) (pobedaGlavnaDiagO tabla dim)) T '() ))
 
 (defun validan_potez (p k tabla)	
 	(if (null (zabranaDijagonalno p k)) '()
@@ -149,9 +143,11 @@
 
 
 
-(defun pobedaX (tabla dim) (if (or (pobedaVertX tabla dim) (pobedaSporednaDiagX tabla dim) (pobedaGlavnaDiagX tabla dim) (manje_od_4_o tabla)) T '() ))
+(defun pobeda (tabla) (if (equal trenutniigrac 'x) (pobedaX tabla) (pobedaO tabla)))
 
-(defun pobedaO (tabla dim) (if (or (pobedaVertO tabla dim) (pobedaSporednaDiagO tabla dim) (pobedaGlavnaDiagO tabla dim) (manje_od_4_x tabla)) T '() ))
+(defun pobedaX (tabla) (if (or (pobedaVertX tabla) (pobedaSporednaDiagX tabla) (pobedaGlavnaDiagX tabla) (manje_od_4_o tabla)) t '() ))
+
+(defun pobedaO (tabla) (if (or (pobedaVertO tabla) (pobedaSporednaDiagO tabla) (pobedaGlavnaDiagO tabla) (manje_od_4_x tabla)) t '() ))
 
 
 (defun zabranaDijagonalno (p k)
@@ -297,7 +293,11 @@
 (odigraj_prikazi '((4 5) (3 5)))
 (odigraj_prikazi '((7 6) (3 6)))
 
+(stampaj_tablu stanje)
+(pobedavertx stanje)
 
+(odigraj_prikazi '((1 1) (2 1)))
+(odigraj_prikazi '((7 1) (6 1)))
 
 (odigraj_prikazi '((1 7) (3 7)))
 (eatleft '(3 7) 1)
