@@ -1,0 +1,23 @@
+(defun kreiraj_listu_brojeva (pocetni krajnji) (cond ((equal pocetni krajnji) '())
+                                      (t (cons pocetni (kreiraj_listu_brojeva (1+ pocetni) krajnji)))))
+
+(defun stampaj_tablu_pom (tabla slova)
+  (if (= (length tabla) realn) (format t "~%  ~{~a ~}~%" (kreiraj_listu_brojeva 0 (1- realN))))
+  (cond                        
+                     ((null (cdr tabla)) (progn (format t "~a ~{~a ~}" (car slova) (car tabla)) (values)))
+                     (t (progn (format t "~a ~{~a ~}~%" (car slova) (car tabla)) (stampaj_tablu_pom (cdr tabla) (cdr slova))))
+    )
+  )
+
+(defun kreiraj_listu_slova (pocetno broj) (cond ((equal broj '0) '())
+                                      (t (cons pocetno (kreiraj_listu_slova (code-char (1+ (char-code pocetno))) (1- broj))))))
+
+
+(defun stampaj_tablu (tabla) (stampaj_tablu_pom tabla (kreiraj_listu_slova #\a realN)))
+
+
+
+(setq parovi_slovo_broj '((a 0) (b 1) (c 2) (d 3) (e 4) (f 5) (g 6) (h 7) (i 8) (j 9) (k 10) (l 11) (m 12) (n 13) (o 14) (p 15) (q 16) (r 17)
+ (s 18) (t 19) (u 20) (v 21) (w 22) (x 23) (y 24) (z 25)))
+
+(defun redni_broj_slova (slovo) (cadr (assoc slovo parovi_slovo_broj)))
