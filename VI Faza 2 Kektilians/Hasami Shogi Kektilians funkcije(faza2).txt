@@ -1,32 +1,57 @@
 ;Globalne promenljive:
 ; realn - dimenzija table
 ; stanje - trenutno stanje table
-; trenutniigrac, netrenutniigrac - x ili o
-;
-;
-;
-;
+; trenutniigrac x ili o
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;INICIJALIZACIJA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun napravi_vrstu (dim el) (cond ((equal dim '0) '())
                                              (t (cons el (napravi_vrstu (1- dim) el)))))
 
-(defun napravi_tablu1 (n n1) (cond ((equal n '0) '())
-                                               ((or (equal n n1) (equal n (1- n1))) (cons (napravi_vrstu n1 'X) (napravi_tablu1 (1- n) n1)) )
-                                               ((or (equal n '1) (equal n '2)) (cons (napravi_vrstu n1 'O) (napravi_tablu1 (1- n) n1)) )
-                                               (t (cons (napravi_vrstu n1 '-) (napravi_tablu1 (1- n) n1)))))
+(defun napravi_tablu (n n1) (cond ((equal n '0) '())
+                                               ((or (equal n n1) (equal n (1- n1))) (cons (napravi_vrstu n1 'X) (napravi_tablu (1- n) n1)) )
+                                               ((or (equal n '1) (equal n '2)) (cons (napravi_vrstu n1 'O) (napravi_tablu (1- n) n1)) )
+                                               (t (cons (napravi_vrstu n1 '-) (napravi_tablu (1- n) n1)))))
 											   
-(defun napravi_tablu (n) (napravi_tablu1 n n))
+
+(defun nova (dim)
+  (progn
+ (setq realn dim)   
+ (setq stanje (napravi_tablu dim dim))
+ (setq trenutniigrac 'x)
+ (stampaj_tablu stanje)  
+           )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;STAMPANJE;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defun stampaj_tablu (tabla)
-  (if (= (length tabla) realn) (format t "~%"))
+(defun kreiraj_listu_brojeva (pocetni krajnji) (cond ((equal pocetni (1+ krajnji)) '())
+                                      (t (cons pocetni (kreiraj_listu_brojeva (1+ pocetni) krajnji)))))
+
+
+(defun stampaj_oznake_kolona (brojevi) (cond ((null brojevi) '())
+                                             ((< (car brojevi) '10) (progn (format t "~a " (car brojevi)) (stampaj_oznake_kolona (cdr brojevi))))
+                                             (t (progn (format t "~a" (car brojevi)) (stampaj_oznake_kolona (cdr brojevi)))) ))
+
+(defun stampaj_tablu_pom (tabla brojevi)
+  (if (= (length tabla) realn) (progn (format t "~%   ") (stampaj_oznake_kolona (kreiraj_listu_brojeva 0 (1- realN))) (format t "~%")))
   (cond                        
-                     ((null (cdr tabla)) (progn (format t "~{~a ~}" (car tabla)) (values)))
-                     (t (progn (format t "~{~a ~}~%" (car tabla)) (stampaj_tablu (cdr tabla))))
-                           
-                     )
-  )
+   ((null (cdr tabla)) (progn (format t "~a ~{~a ~}~%~%" (car brojevi) (car tabla)) (values)))
+   (t (progn (if (< (car brojevi) '10) 
+                 (format t "~a  ~{~a ~}~%" (car brojevi) (car tabla)) 
+                 (format t "~a ~{~a ~}~%" (car brojevi) (car tabla)) ) (stampaj_tablu_pom (cdr tabla) (cdr brojevi))))
+    )
+)
+
+
+
+(defun stampaj_tablu (tabla) (stampaj_tablu_pom tabla (kreiraj_listu_brojeva 0 (1- realN))))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;POTEZI;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 												
 (defun postavi (el n m mat) (cond 
@@ -42,62 +67,21 @@
   )
 
 
+(defun suprotni_igrac (igrac) (if (equal igrac 'X) 'O 'X))
+
 (defun odigraj_prikazi (pot)
-  ;(progn (setq pom (copy-tree pot)) (values)) ;zauzima novo mesto u memoriji
   (if (validan_potez (car pot) (cadr pot) stanje trenutniigrac)
       ;then
       (progn 
               (setq stanje (potez (car pot) (cadr pot) stanje trenutniigrac))                                
               (stampaj_tablu stanje)
-              (if (pobeda stanje) (format t "~%~%pobednik je ~a" trenutniigrac))
-              (if (equal trenutniigrac 'o)
-                     (progn (setq trenutniigrac 'x) (setq netrenutniigrac 'o))
-                     (progn (setq trenutniigrac 'o) (setq netrenutniigrac 'x))                          
-                )
+              (if (pobeda stanje trenutniigrac) (format t "POBEDNIK JE ~a~%~%" trenutniigrac))
+              (setq trenutniigrac (suprotni_igrac trenutniigrac))
               (values)
         )
       ;else
-     '())     
+     '(NEVALIDAN POTEZ))     
 )
-
-											 
-												 
-(defun pobedaVert (tabla el n m count) (cond ((equal '0 count) T)
-                                                       ((and (equal '1 n) (equal '0 m)) '())
-                                                       ((equal '1 n) (pobedaVert tabla el (1- realn) (1- m) 4))
-                                                       (t (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth m (nth (1- n) tabla)))) 
-                                                              (pobedaVert tabla el (1- n) m (1- count)) 
-                                                              (pobedaVert tabla el (1- n) m count))) ))
-
-
-(defun pobedaVertX (tabla) (pobedaVert tabla 'x  (1- realn) (1- realn) 4))
-
-(defun pobedaVertO (tabla) (pobedaVert (reverse tabla) 'O (1- realn) (1- realn) 4))	
-
-
-;formatirana funkcija da je allegro lepo prepozna 02.12.2017. 18:41
-(defun pobedaSporednaDiag (tabla el n m count) 
-	(cond ((equal '0 count) T)
-		((and (equal '2 n) (equal '3 m)) '())
-		((and (equal '1 n) (equal (1- realn) m)) (pobedaSporednaDiag tabla el 2 (- realn '2) 4))
-		((and (< n realn) (< m realn) (> m '0)) (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth (1- m) (nth (1+ n) tabla))))
-							    (pobedaSporednaDiag tabla el (1+ n) (1- m) (1- count))
-							    (pobedaSporednaDiag tabla el (1+ n) (1- m) 5)))
-		((< m '1) (pobedaSporednaDiag tabla el 2 (+ (- n 3) m) 4))
-		(t (pobedaSporednaDiag tabla el m (1- n) 4) ) ))
-										 
-
-(defun okreni_po_vertikali (tabla) (cond ((null tabla) '())
-                                                      (t (cons (reverse (car tabla)) (okreni_po_vertikali (cdr tabla))))))
-
-(defun pobedaSporednaDiagX (tabla) (pobedaSporednaDiag tabla 'X  (- realn 5) (- realn 1) 4))
-
-(defun pobedaGlavnaDiagX (tabla) (pobedaSporednaDiag (okreni_po_vertikali tabla) 'X  (- realn 5) (- realn 1) 4))
-
-(defun pobedaGlavnaDiagO (tabla) (pobedaSporednaDiag (reverse tabla) 'O  (- realn 5) (- realn 1) 4))
-
-(defun pobedaSporednaDiagO (tabla) (pobedaSporednaDiag (okreni_po_vertikali (reverse tabla)) 'O  (- realn 5) (- realn 1) 4))
-
 
 (defun validan_potez (p k tabla igrac)	
 	(if (null (zabranaDijagonalno p k)) '()
@@ -130,24 +114,6 @@
 	)
 )
 
-(defun preostalih (tabla el) (cond ((null tabla) '0)
-                                               ((listp (car tabla)) (+ (preostalih (car tabla) el) (preostalih (cdr tabla) el)) )
-                                               ((equal el (car tabla)) (1+ (preostalih (cdr tabla) el)))
-                                               (t (preostalih (cdr tabla) el) )))
-
-
-(defun manje_od_4_x (tabla) (if (< (preostalih tabla 'x) 4) t '()))
-
-
-(defun manje_od_4_o (tabla) (if (< (preostalih tabla 'o) 4) t '()))
-
-
-
-(defun pobeda (tabla) (if (equal trenutniigrac 'x) (pobedaX tabla) (pobedaO tabla)))
-
-(defun pobedaX (tabla) (if (or (pobedaVertX tabla) (pobedaSporednaDiagX tabla) (pobedaGlavnaDiagX tabla) (manje_od_4_o tabla)) t '() ))
-
-(defun pobedaO (tabla) (if (or (pobedaVertO tabla) (pobedaSporednaDiagO tabla) (pobedaGlavnaDiagO tabla) (manje_od_4_x tabla)) t '() ))
 
 
 (defun zabranaDijagonalno (p k)
@@ -248,20 +214,72 @@
    (t '(nesto ne valja))   
   )  
 )
+											 
 
 
-(defun suprotni_igrac (igrac) (if (equal igrac 'X) 'O 'X))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;POBEDA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defun nova (dim)
-  (progn
- (setq realn dim)   
- (setq stanje (napravi_tablu dim))
- (setq trenutniigrac 'x)
- (setq netrenutniigrac 'o)
- (stampaj_tablu stanje)  
-           )
-)
+
+												 
+(defun pobedaVert (tabla el n m count) (cond ((equal '0 count) T)
+                                                       ((and (equal '1 n) (equal '0 m)) '())
+                                                       ((equal '1 n) (pobedaVert tabla el (1- realn) (1- m) 4))
+                                                       (t (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth m (nth (1- n) tabla)))) 
+                                                              (pobedaVert tabla el (1- n) m (1- count)) 
+                                                              (pobedaVert tabla el (1- n) m count))) ))
+
+
+(defun pobedaVertX (tabla) (pobedaVert tabla 'x  (1- realn) (1- realn) 4))
+
+(defun pobedaVertO (tabla) (pobedaVert (reverse tabla) 'O (1- realn) (1- realn) 4))	
+
+
+
+(defun pobedaSporednaDiag (tabla el n m count) 
+	(cond ((equal '0 count) T)
+		((and (equal '2 n) (equal '3 m)) '())
+		((and (equal '1 n) (equal (1- realn) m)) (pobedaSporednaDiag tabla el 2 (- realn '2) 4))
+		((and (< n realn) (< m realn) (> m '0)) (if (and (equal (nth m (nth n tabla)) el) (equal (nth m (nth n tabla)) (nth (1- m) (nth (1+ n) tabla))))
+							    (pobedaSporednaDiag tabla el (1+ n) (1- m) (1- count))
+							    (pobedaSporednaDiag tabla el (1+ n) (1- m) 5)))
+		((< m '1) (pobedaSporednaDiag tabla el 2 (+ (- n 3) m) 4))
+		(t (pobedaSporednaDiag tabla el m (1- n) 4) ) ))
+										 
+
+(defun okreni_po_vertikali (tabla) (cond ((null tabla) '())
+                                                      (t (cons (reverse (car tabla)) (okreni_po_vertikali (cdr tabla))))))
+
+(defun pobedaSporednaDiagX (tabla) (pobedaSporednaDiag tabla 'X  (- realn 5) (- realn 1) 4))
+
+(defun pobedaGlavnaDiagX (tabla) (pobedaSporednaDiag (okreni_po_vertikali tabla) 'X  (- realn 5) (- realn 1) 4))
+
+(defun pobedaGlavnaDiagO (tabla) (pobedaSporednaDiag (reverse tabla) 'O  (- realn 5) (- realn 1) 4))
+
+(defun pobedaSporednaDiagO (tabla) (pobedaSporednaDiag (okreni_po_vertikali (reverse tabla)) 'O  (- realn 5) (- realn 1) 4))
+
+(defun preostalih (tabla el) (cond ((null tabla) '0)
+                                               ((listp (car tabla)) (+ (preostalih (car tabla) el) (preostalih (cdr tabla) el)) )
+                                               ((equal el (car tabla)) (1+ (preostalih (cdr tabla) el)))
+                                               (t (preostalih (cdr tabla) el) )))
+
+
+(defun manje_od_4_x (tabla) (if (< (preostalih tabla 'x) 4) t '()))
+
+
+(defun manje_od_4_o (tabla) (if (< (preostalih tabla 'o) 4) t '()))
+
+
+
+(defun pobeda (tabla) (if (equal trenutniigrac 'x) (pobedaX tabla) (pobedaO tabla)))
+
+(defun pobedaX (tabla) (if (or (pobedaVertX tabla) (pobedaSporednaDiagX tabla) (pobedaGlavnaDiagX tabla) (manje_od_4_o tabla)) t '() ))
+
+(defun pobedaO (tabla) (if (or (pobedaVertO tabla) (pobedaSporednaDiagO tabla) (pobedaGlavnaDiagO tabla) (manje_od_4_x tabla)) t '() ))
+
+
+
 
 
 
@@ -310,6 +328,7 @@
 (defun sledbenici (tabla igrac) (sledbenici_pom tabla (lista_mogucih_poteza tabla '0 '0 igrac) igrac))
 
 
+
 (defun stampaj_sledbenike (sled) (cond ((null sled) '())
                                         (t (progn (stampaj_tablu (car sled)) (format t "~{~%~a~%~}" '(__________________)) (stampaj_sledbenike (cdr sled))))))
 
@@ -326,95 +345,30 @@
 
 (nova 9)
 
+;proba partije za tablu 9x9
 
-;proba partije
+(odigraj_prikazi '((1 4) (3 4))) ;X
+(odigraj_prikazi '((7 5) (4 5))) ;O
 
-(odigraj_prikazi '((1 4) (3 4)))
-(odigraj_prikazi '((7 5) (4 5)))
+(odigraj_prikazi '((0 4) (2 4))) ;X
+(odigraj_prikazi '((4 5) (3 5))) ;O
 
-(odigraj_prikazi '((0 4) (2 4)))
-(odigraj_prikazi '((4 5) (3 5)))
+(odigraj_prikazi '((2 4) (4 4))) ;X
+(odigraj_prikazi '((7 6) (3 6))) ;O
 
-(odigraj_prikazi '((2 4) (4 4)))
-(odigraj_prikazi '((7 6) (3 6)))
+(odigraj_prikazi '((1 7) (3 7))) ;X
+(odigraj_prikazi '((8 3) (6 3))) ;O
 
-(odigraj_prikazi '((1 7) (3 7)))
-(odigraj_prikazi '((8 3) (6 3)))
+(odigraj_prikazi '((1 5) (5 5))) ;X
+(odigraj_prikazi '((7 1) (6 1))) ;O
 
-(odigraj_prikazi '((1 5) (5 5)))
-(odigraj_prikazi '((7 1) (6 1)))
+(odigraj_prikazi '((1 3) (3 3))) ;X
+(odigraj_prikazi '((6 1) (7 1))) ;O
 
-(odigraj_prikazi '((1 3) (3 3)))
-(odigraj_prikazi '((6 1) (7 1)))
+(odigraj_prikazi '((1 2) (2 2))) ;X
+(odigraj_prikazi '((7 1) (6 1))) ;O
 
-(odigraj_prikazi '((1 2) (2 2)))
-(odigraj_prikazi '((7 1) (6 1)))
-
-(odigraj_prikazi '((1 6) (6 6)))
-(odigraj_prikazi '((6 1) (7 1)))
-
-;xpotezi
-
-(odigraj_prikazi '((1 4) (3 4)))
-(odigraj_prikazi '((0 4) (2 4)))
-(odigraj_prikazi '((2 4) (4 4)))
-
-;o potezi
-
-(odigraj_prikazi '((7 5) (4 5)))
-(odigraj_prikazi '((4 5) (3 5)))
-(odigraj_prikazi '((7 6) (3 6)))
-
-(stampaj_tablu stanje)
-(pobedavertx stanje)
-
-(odigraj_prikazi '((1 1) (2 1)))
-(odigraj_prikazi '((7 1) (6 1)))
-
-(odigraj_prikazi '((1 7) (3 7)))
-(eatleft '(3 7) 1)
-
-(odigraj_prikazi '((1 5) (3 5)))
-(eatleft '(3 5) 1)
-
-(setq trenutniigrac 'o)
-(setq netrenutniigrac 'x)
-
-(odigraj_prikazi '((7 2) (3 2)))
-(odigraj_prikazi '((7 3) (3 3)))
-
-(setq trenutniigrac 'x)
-(setq netrenutniigrac 'o)
-
-(odigraj_prikazi '((1 1) (3 1)))
-(eatleft '(1 0) 1)
-(eatright '(3 1) 1)
-(eatright '(3 8) 1)
-
-//eatup-down
-
-(setq trenutniigrac 'o)
-(setq netrenutniigrac 'x)
-
-(odigraj_prikazi '((7 2) (2 2)))
-(odigraj_prikazi '((8 2) (3 2)))
-
-(setq trenutniigrac 'x)
-(setq netrenutniigrac 'o)
+(odigraj_prikazi '((1 6) (6 6))) ;X
+(odigraj_prikazi '((6 1) (7 1))) ;O
 
 
-(odigraj_prikazi '((1 1) (4 1)))
-(odigraj_prikazi '((4 1) (4 2)))
-(eatup '(4 2) 1)
-
-(setq trenutniigrac 'o)
-(setq netrenutniigrac 'x)
-
-(odigraj_prikazi '((7 3) (3 3)))
-(odigraj_prikazi '((3 3) (3 2)))
-
-(setq trenutniigrac 'x)
-(setq netrenutniigrac 'o)
-
-(odigraj_prikazi '((1 2) (2 2)))
-(eatdown '(2 2) 1)
