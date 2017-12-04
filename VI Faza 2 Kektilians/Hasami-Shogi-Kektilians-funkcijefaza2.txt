@@ -38,12 +38,13 @@
 (defun stampaj_tablu_pom (tabla brojevi)
   (if (= (length tabla) realn) (progn (format t "~%   ") (stampaj_oznake_kolona (kreiraj_listu_brojeva 0 (1- realN))) (format t "~%")))
   (cond                        
-   ((null (cdr tabla)) (progn (format t "~a ~{~a ~}~%~%" (car brojevi) (car tabla)) (values)))
+   ((null (cdr tabla)) (progn (if (< (car brojevi) '10) (format t "~a  ~{~a ~}~%~%" (car brojevi) (car tabla)) (format t "~a ~{~a ~}~%~%" (car brojevi) (car tabla))) (values)))
    (t (progn (if (< (car brojevi) '10) 
                  (format t "~a  ~{~a ~}~%" (car brojevi) (car tabla)) 
                  (format t "~a ~{~a ~}~%" (car brojevi) (car tabla)) ) (stampaj_tablu_pom (cdr tabla) (cdr brojevi))))
     )
 )
+
 
 
 
@@ -272,7 +273,7 @@
 
 
 
-(defun pobeda (tabla) (if (equal trenutniigrac 'x) (pobedaX tabla) (pobedaO tabla)))
+(defun pobeda (tabla igrac) (if (equal igrac 'x) (pobedaX tabla) (pobedaO tabla)))
 
 (defun pobedaX (tabla) (if (or (pobedaVertX tabla) (pobedaSporednaDiagX tabla) (pobedaGlavnaDiagX tabla) (manje_od_4_o tabla)) t '() ))
 
