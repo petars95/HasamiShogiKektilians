@@ -1,0 +1,59 @@
+
+(defun max-stanje (lsv)
+  (max-stanje-i (cdr lsv) (car lsv)))
+
+(defun max-stanje-i (lsv stanje-vrednost)
+  (cond ((null lsv) stanje-vrednost)
+        ((> (cadar lsv) (cadr stanje-vrednost))
+         (max-stanje-i (cdr lsv) (car lsv)))
+        (t (max-stanje-i (cdr lsv) stanje-vrednost))))
+
+(defun min-stanje (lsv)
+  (min-stanje-i (cdr lsv) (car lsv)))
+
+(defun min-stanje-i (lsv stanje-vrednost)
+  (cond ((null lsv) stanje-vrednost)
+        ((< (cadar lsv) (cadr stanje-vrednost))
+         (min-stanje-i (cdr lsv) (car lsv)))
+        (t (min-stanje-i (cdr lsv) stanje-vrednost))))
+
+
+(defun minimax (stanje dubina moj-potez)
+  (let ((lp (nova-stanja stanje))
+        (f (if moj-potez 'max-stanje 'min-stanje)))
+    (cond ((or (zerop dubina) (null lp))
+           (list stanje (proceni-stanje stanje)))
+          (t (apply f (list (mapcar (lambda (x)
+                                      (minimax x (1- dubina)
+                                               (not moj-potez))) lp)))))))
+
+(defun nova-stanja (stanje)
+  (case stanje
+    ((A) '(B C D))
+    ((B) '(E F))
+    ((C) '(G H))
+    ((D) '(I J))
+    ((E) '(K L))
+    ((F) '(M N))
+    ((G) '(O))
+    ((H) '(P Q))
+    ((I) '(R S))
+    ((J) '(T U))
+    (t '())))
+
+(defun proceni-stanje (stanje)
+  (case stanje
+    ((K) 2)
+    ((L) 3)
+    ((M) 5)
+    ((N) 9)
+    ((O) 0)
+    ((P) 7)
+    ((Q) 4)
+    ((R) 2)
+    ((S) 1)
+    ((T) 5)
+    ((U) 6)
+    (t 0)))
+
+(minimax 'A '3 'T)

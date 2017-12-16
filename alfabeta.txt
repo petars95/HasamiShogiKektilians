@@ -1,0 +1,15 @@
+﻿
+Polazne vrednosti: α = -10, β = 10
+max-value (stanje, graf, α, β, dubina, maxdub)
+	Ako je dubina == maxdub onda vrati proceni(stanje);
+	Za svako S slebenici(stanje)
+	α = max(α, min-value(S, graf, α, β, dubina-1, maxdub))
+	Ako je α >= β onda vrati β;
+	Vrati α;
+
+min-value (stanje, graf, α, β, dubina, maxdub)
+	Ako je dubina == maxdub onda vrati proceni(stanje);
+	Za svako S slebenici(stanje)
+	β := min(β, max-value(S, graf, α, β, dubina-1, maxdub))
+	Ako je β <= α onda vrati α;
+	Vrati β;
