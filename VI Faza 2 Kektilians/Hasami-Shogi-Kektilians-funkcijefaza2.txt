@@ -266,18 +266,18 @@
                                                (t (preostalih (cdr tabla) el) )))
 
 
-(defun manje_od_4_x (tabla) (if (< (preostalih tabla 'x) 4) t '()))
+(defun manje_od_5_x (tabla) (if (< (preostalih tabla 'x) 5) t '()))
 
 
-(defun manje_od_4_o (tabla) (if (< (preostalih tabla 'o) 4) t '()))
+(defun manje_od_5_o (tabla) (if (< (preostalih tabla 'o) 5) t '()))
 
 
 
 (defun pobeda (tabla igrac) (if (equal igrac 'x) (pobedaX tabla) (pobedaO tabla)))
 
-(defun pobedaX (tabla) (if (or (pobedaVertX tabla) (pobedaSporednaDiagX tabla) (pobedaGlavnaDiagX tabla) (manje_od_4_o tabla)) t '() ))
+(defun pobedaX (tabla) (if (or (pobedaVertX tabla) (pobedaSporednaDiagX tabla) (pobedaGlavnaDiagX tabla) (manje_od_5_o tabla)) t '() ))
 
-(defun pobedaO (tabla) (if (or (pobedaVertO tabla) (pobedaSporednaDiagO tabla) (pobedaGlavnaDiagO tabla) (manje_od_4_x tabla)) t '() ))
+(defun pobedaO (tabla) (if (or (pobedaVertO tabla) (pobedaSporednaDiagO tabla) (pobedaGlavnaDiagO tabla) (manje_od_5_x tabla)) t '() ))
 
 
 

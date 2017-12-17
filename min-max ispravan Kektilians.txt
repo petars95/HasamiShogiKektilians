@@ -1,0 +1,78 @@
+(defun max-stanje (lsv)
+  (max-stanje-i (cdr lsv) (car lsv)))
+
+(defun max-stanje-i (lsv stanje-vrednost)
+  (cond ((null lsv) stanje-vrednost)
+        ((> (cadar lsv) (cadr stanje-vrednost))
+         (max-stanje-i (cdr lsv) (car lsv)))
+        (t (max-stanje-i (cdr lsv) stanje-vrednost))))
+
+(defun min-stanje (lsv)
+  (min-stanje-i (cdr lsv) (car lsv)))
+
+(defun min-stanje-i (lsv stanje-vrednost)
+  (cond ((null lsv) stanje-vrednost)
+        ((< (cadar lsv) (cadr stanje-vrednost))
+         (min-stanje-i (cdr lsv) (car lsv)))
+        (t (min-stanje-i (cdr lsv) stanje-vrednost))))
+
+
+(defun minimax (m_stanje dubina moj-potez roditelj)
+  (let ((lp (sledbenici m_stanje (figura_comp moj-potez)))
+        (f (if moj-potez 'max-stanje 'min-stanje)))
+    (cond ((or (zerop dubina) (null lp))
+           (list m_stanje (proc m_stanje) roditelj))
+          (t (apply f (list (mapcar (lambda (x)
+                                      (minimax x (1- dubina)
+                                               (not moj-potez)(if (null roditelj) x roditelj))) lp)))))))
+
+
+
+(defun figura_comp (player) (if (null player) 'o 'x))
+
+
+(stampaj_tablu (caddr (minimax stanje 1 T '())))
+
+
+
+
+(defun proceni_triv (tabla red kol)
+  
+  
+  (let ((xvr (1+ red)) (yvr (- realn red)))
+  (cond
+  ((equalp red 7) 0)
+
+  ((equal (nth kol (nth red tabla)) 'x) 
+    (if (equal (1+ kol) realN)
+        (+ (proceni_triv tabla (1+ red) 0) xvr)
+        (+ (proceni_triv tabla red (1+ kol)) xvr) )
+   )
+ 
+  ((equal (nth kol (nth red tabla)) 'o)
+    (if (equal (1+ kol) realN)
+        (- (proceni_triv tabla (1+ red) 0) yvr)
+        (- (proceni_triv tabla red (1+ kol)) yvr) )
+   )
+
+  ((equal (nth kol (nth red tabla)) '-)    
+    (if (equal (1+ kol) realN)
+        (+ 0 (proceni_triv tabla (1+ red) 0))
+        (+ 0 (proceni_triv tabla red (1+ kol))) )
+   )
+   
+   )
+    )
+  
+  )
+
+(defun proc (tabla)
+  (proceni_triv tabla 2 0)
+  )
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;TEST
+
+(stampaj_tablu (setq stanje (caddr (minimax stanje 1 'T '()))))
+
+(stampaj_tablu (setq stanje (caddr (minimax stanje 1 nil '()))))
