@@ -27,6 +27,34 @@
                                       (minimax x (1- dubina)
                                                (not moj-potez))) lp)))))))
 
+
+
+///////////////SPAGETI/////////////////////////
+(defun alphabeta (m_stanje dubina alpha beta moj-potez roditelj)
+	(if (or (zerop dubina) (kraj_igre m_stanje))
+		(list m_stanje (proc m_stanje) roditelj))
+	(if (null moj-potez)
+		((setq v 99999)
+		(dolist	(lp (sledbenici m_stanje (figura_comp moj-potez))) '() (cadr lp)
+			(setq v1 (alphabeta (car lp) (1- dubina) alpha beta drugoOdMojPotez neZnamStaJeRoditelj))
+			(if (< v1 v) (setq v v1))
+			(if (< beta v) (setq b beta) (setq b v))
+			(if (<= b alpha) (setq lp '()))
+		))
+		((setq v -99999)
+		(dolist	(lp (sledbenici m_stanje (figura_comp moj-potez))) '() (cadr lp)
+			(setq v1 (alphabeta (car lp) (1- dubina) alpha beta drugoOdMojPotez neZnamStaJeRoditelj))
+			(if (> v1 v) (setq v v1))
+			(if (> alpha v) (setq a alpha) (setq a v))
+			(if (<= a alpha) (setq lp '()))
+		))
+	)
+	(cond (t v))
+)
+
+
+
+
 (defun nova-stanja (stanje)
   (case stanje
     ((A) '(B C D))
