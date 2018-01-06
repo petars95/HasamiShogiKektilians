@@ -70,15 +70,12 @@
                      
   (progn (defparameter *T1-FACTS* (napravi_cinjenice stanje 0 0)) (prepare-knowledge *T1-RULES* *T1-FACTS* 10) 
     
-    (+ ( count-results '(On x ?i ?j))
-       (* (count-results '(On o ?i ?j)) -1)
-       
-       (* (count-results '(AND (Dva-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.1)
-       (* (count-results '(AND (Dva-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.1)
-       
-       (* (count-results '(AND (Tri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.25)
-       (* (count-results '(AND (Tri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.25)
-       
+    (+ ;(count-results '(On x ?i ?j))
+       ;(* (count-results '(On o ?i ?j)) -1)
+       ;(* (count-results '(AND (Dva-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.1)
+       ;(* (count-results '(AND (Dva-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.1)
+       ;(* (count-results '(AND (Tri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.25)
+       ;(* (count-results '(AND (Tri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.25)
        (* (count-results '(AND (Cetri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.85)
        (* (count-results '(AND (Cetri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.85)
     )

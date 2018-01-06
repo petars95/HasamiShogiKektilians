@@ -1,0 +1,82 @@
+
+(defun alphabeta (m_stanje dubina alpha beta moj-potez roditelj)
+    (if (or (zerop dubina) (pobeda m_stanje (figura_comp moj-potez)))
+        (list m_stanje (proc m_stanje) roditelj alpha beta)
+        (if (null moj-potez)
+            (min-stanje m_stanje dubina alpha beta moj-potez roditelj (sledbenici m_stanje (figura_comp moj-potez)) (list '() '100))
+            (max-stanje m_stanje dubina alpha beta moj-potez roditelj (sledbenici m_stanje (figura_comp moj-potez)) (list '() '-100))
+        )
+    )
+)
+ 
+(defun max-stanje (m_stanje dubina alpha beta moj-potez roditelj lp v)
+    (if (null lp) v
+    (let* ((v1 (max2 (alphabeta (car lp) (1- dubina) alpha beta (not moj-potez) (if (null roditelj) (car lp) roditelj)) v))
+        (a (maxi v1 alpha))
+        )
+        (if (<= beta a) v1
+            (max-stanje m_stanje dubina a beta moj-potez roditelj (cdr lp) v1)
+        )
+    )
+    )
+)
+ 
+(defun min-stanje (m_stanje dubina alpha beta moj-potez roditelj lp v)
+    (if (null lp) v
+    (let* ((v1 (min2 (alphabeta (car lp) (1- dubina) alpha beta (not moj-potez) (if (null roditelj) (car lp) roditelj)) v))
+        (b (mini v1 beta))
+        )
+        (if (<= b alpha) v1
+            (min-stanje m_stanje dubina alpha b moj-potez roditelj (cdr lp) v1)
+        )
+    )
+    )
+)
+ 
+(defun maxi (p d)
+    (if (> (cadr p) d) (cadr p) d))
+   
+(defun mini (p d)
+    (if (< (cadr p) d) (cadr p) d))
+ 
+(defun max2 (p d)
+    (if (> (cadr p) (cadr d)) p d))
+   
+(defun min2 (p d)
+    (if (< (cadr p) (cadr d)) p d))
+
+(defun proceni_triv (tabla red kol)
+  
+  
+  (let ((xvr (1+ red)) (yvr (- realn red)))
+  (cond
+  ((equalp red 7) 0)
+
+  ((equal (nth kol (nth red tabla)) 'x) 
+    (if (equal (1+ kol) realN)
+        (+ (proceni_triv tabla (1+ red) 0) xvr)
+        (+ (proceni_triv tabla red (1+ kol)) xvr) )
+   )
+ 
+  ((equal (nth kol (nth red tabla)) 'o)
+    (if (equal (1+ kol) realN)
+        (- (proceni_triv tabla (1+ red) 0) yvr)
+        (- (proceni_triv tabla red (1+ kol)) yvr) )
+   )
+
+  ((equal (nth kol (nth red tabla)) '-)    
+    (if (equal (1+ kol) realN)
+        (+ 0 (proceni_triv tabla (1+ red) 0))
+        (+ 0 (proceni_triv tabla red (1+ kol))) )
+   )
+   
+   )
+    )
+  
+  )
+
+(defun proc (tabla)
+  (proceni_triv tabla 2 0)
+  )
+
+(defun figura_comp (player) (if (null player) 'o 'x))
