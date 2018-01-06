@@ -1,0 +1,85 @@
+
+(defun !eq (a b)
+  (equal a b))
+
+(defun !ne (a b)
+  (not (equal a b)))
+
+
+(defun =dec (x) (1- x))
+(defun =inc (x) (1+ x))
+
+(defun =inc2 (x) (+ x 2))
+(defun =dec2 (x) (- x 2))
+
+(defun =inc3 (x) (+ x 3))
+(defun =dec3 (x) (- x 3))
+
+(defun =inc4 (x) (+ x 4))
+(defun =dec4 (x) (- x 4))
+
+
+
+(defparameter *T1-RULES* '(                           
+                           ;vertikalno 2 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) ?j)) THEN (Dva-u-nizu-x  ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) ?j)) THEN (Dva-u-nizu-o  ?i ?j))
+                           
+                           ;glavna dijagonala - 2 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) (=inc ?j))) THEN (Dva-u-nizu-x  ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) (=dec ?j))) THEN (Dva-u-nizu-o  ?i ?j))
+                           
+                           ;sporedna dijagonala - 2 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) (=dec ?j))) THEN (Dva-u-nizu-x  ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) (=inc ?j))) THEN (Dva-u-nizu-o  ?i ?j))
+                           
+                           ;vertikalno 3 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) ?j) (On x (=inc2 ?i) ?j)   ) THEN (Tri-u-nizu-x ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) ?j) (On o (=dec2 ?i) ?j)   ) THEN (Tri-u-nizu-o ?i ?j))
+                           
+                           ;glavna dijagonala - 3 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) (=inc ?j)) (On x (=inc2 ?i) (=inc2 ?j))   ) THEN (Tri-u-nizu-x ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) (=dec ?j)) (On o (=dec2 ?i) (=dec2 ?j))   ) THEN (Tri-u-nizu-o ?i ?j))
+                           
+                           ;sporedna dijagonala - 3 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) (=dec ?j)) (On x (=inc2 ?i) (=dec2 ?j))   ) THEN (Tri-u-nizu-x ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) (=inc ?j)) (On o (=dec2 ?i) (=inc2 ?j))   ) THEN (Tri-u-nizu-o ?i ?j))
+          
+                           ;vertikalno 4 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) ?j) (On x (=inc2 ?i) ?j) (On x (=inc3 ?i) ?j) ) THEN (Cetri-u-nizu-x ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) ?j) (On o (=dec2 ?i) ?j) (On o (=dec3 ?i) ?j) ) THEN (Cetri-u-nizu-o ?i ?j))
+
+                           ;glavna dijagonala - 4 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) (=inc ?j)) (On x (=inc2 ?i) (=inc2 ?j)) (On x (=inc3 ?i) (=inc3 ?j)) ) THEN (Cetri-u-nizu-x ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) (=dec ?j)) (On o (=dec2 ?i) (=dec2 ?j)) (On o (=dec3 ?i) (=dec3 ?j)) ) THEN (Cetri-u-nizu-o ?i ?j))
+
+                           ;sporedna dijagonala - 4 u nizu
+                           (IF (AND (On x ?i ?j) (On x (=inc ?i) (=dec ?j)) (On x (=inc2 ?i) (=dec2 ?j)) (On x (=inc3 ?i) (=dec3 ?j)) ) THEN (Cetri-u-nizu-x ?i ?j))
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) (=inc ?j)) (On o (=dec2 ?i) (=inc2 ?j)) (On o (=dec3 ?i) (=inc3 ?j)) ) THEN (Cetri-u-nizu-o ?i ?j))   
+                           
+                           (IF (AND (On - ?i ?j) (On - (=dec ?i) ?j) (On - (=inc ?i) ?j) (On - ?i (=dec ?j)) (On - ?i (=inc ?j))
+                                    (On - (=dec ?i) (=dec ?j)) (On - (=dec ?i) (=inc ?j)) (On - (=inc ?i) (=inc ?j)) (On - (=inc ?i) (=dec ?j))) THEN (slobodno_polje ?i ?j))
+	))
+
+(defun napravi_cinjenice (tabla i j) (cond ((equal i realn) '())
+                                           ((equal j realn) (napravi_cinjenice tabla (1+ i) '0))
+                                           (t (cons (list 'On (nth j (nth i tabla)) i j) (napravi_cinjenice tabla i (1+ j)) )) ))
+
+
+(defun proc (tabla)
+                     
+  (progn (defparameter *T1-FACTS* (napravi_cinjenice stanje 0 0)) (prepare-knowledge *T1-RULES* *T1-FACTS* 10) 
+    
+    (+ (count-results '(On x ?i ?j))
+       (* (count-results '(On o ?i ?j)) -1)
+       (* (count-results '(AND (Dva-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.1)
+       (* (count-results '(AND (Dva-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.1)
+       (* (count-results '(AND (Tri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.25)
+       (* (count-results '(AND (Tri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.25)
+       (* (count-results '(AND (Cetri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.85)
+       (* (count-results '(AND (Cetri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.85)
+    )
+    
+    ))
+                     
+
