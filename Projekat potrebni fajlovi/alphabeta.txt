@@ -75,7 +75,7 @@
   
   )
 
-(defun proc (tabla)
+(defun proc_m (tabla)
   (proceni_triv tabla 2 0)
   )
 

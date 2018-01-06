@@ -17,7 +17,7 @@
 
 (defun =inc4 (x) (+ x 4))
 (defun =dec4 (x) (- x 4))
-
+(defun =div (n) (floor(/ n 2)))
 
 
 (defparameter *T1-RULES* '(                           
@@ -55,8 +55,33 @@
 
                            ;sporedna dijagonala - 4 u nizu
                            (IF (AND (On x ?i ?j) (On x (=inc ?i) (=dec ?j)) (On x (=inc2 ?i) (=dec2 ?j)) (On x (=inc3 ?i) (=dec3 ?j)) ) THEN (Cetri-u-nizu-x ?i ?j))
-                           (IF (AND (On o ?i ?j) (On o (=dec ?i) (=inc ?j)) (On o (=dec2 ?i) (=inc2 ?j)) (On o (=dec3 ?i) (=inc3 ?j)) ) THEN (Cetri-u-nizu-o ?i ?j))   
-                           
+                           (IF (AND (On o ?i ?j) (On o (=dec ?i) (=inc ?j)) (On o (=dec2 ?i) (=inc2 ?j)) (On o (=dec3 ?i) (=inc3 ?j)) ) THEN (Cetri-u-nizu-o ?i ?j))
+
+                           ;mid or fid
+                           (IF (AND (ON x ?i ?j) (!eq ?i (=div REALN)) (!eq ?j (=div REALN))    ) THEN (MID-OR-FID-x ?i ?j))
+
+                           ;;lose za x , oduzeti  -0.2
+                           (IF (AND (ON x ?i ?j) (On o (=dec ?i) ?j)) THEN (PORED-X ?i ?j))
+                           (IF (AND (ON x ?i ?j) (On o (=inc ?i) ?j)) THEN (PORED-X ?i ?j))
+                           (IF (AND (ON x ?i ?j) (On o ?i (=dec ?j))) THEN (PORED-X ?i ?j))
+                           (IF (AND (ON x ?i ?j) (On o ?i (=inc ?j))) THEN (PORED-X ?i ?j))
+
+                           (IF (AND (ON x ?i ?j) (On o (=dec ?i) (=dec ?j))) THEN (PORED-X ?i ?j))
+                           (IF (AND (ON x ?i ?j) (On o (=dec ?i) (=inc ?j))) THEN (PORED-X ?i ?j))
+                           (IF (AND (ON x ?i ?j) (On o (=inc ?i) (=inc ?j))) THEN (PORED-X ?i ?j))
+                           (IF (AND (ON x ?i ?j) (On o (=inc ?i) (=dec ?j))) THEN (PORED-X ?i ?j))
+
+                           ;;lose za o. dodati 0.2
+                           (IF (AND (ON o ?i ?j) (On x (=dec ?i) ?j)) THEN (PORED-o ?i ?j))
+                           (IF (AND (ON o ?i ?j) (On x (=inc ?i) ?j)) THEN (PORED-o ?i ?j))
+                           (IF (AND (ON o ?i ?j) (On x ?i (=dec ?j))) THEN (PORED-o ?i ?j))
+                           (IF (AND (ON o ?i ?j) (On x ?i (=inc ?j))) THEN (PORED-o ?i ?j))
+
+                           (IF (AND (ON o ?i ?j) (On x (=dec ?i) (=dec ?j))) THEN (PORED-o ?i ?j))
+                           (IF (AND (ON o ?i ?j) (On x (=dec ?i) (=inc ?j))) THEN (PORED-o ?i ?j))
+                           (IF (AND (ON o ?i ?j) (On x (=inc ?i) (=inc ?j))) THEN (PORED-o ?i ?j))
+                           (IF (AND (ON o ?i ?j) (On x (=inc ?i) (=dec ?j))) THEN (PORED-o ?i ?j))
+
                          
 	))
 
@@ -68,18 +93,48 @@
 
 (defun proc (tabla)
                      
-  (progn (defparameter *T1-FACTS* (napravi_cinjenice stanje 0 0)) (prepare-knowledge *T1-RULES* *T1-FACTS* 10) 
+  (progn (defparameter *T1-FACTS* (napravi_cinjenice tabla 0 0)) (prepare-knowledge *T1-RULES* *T1-FACTS* 10) 
     
-    (+ ;(count-results '(On x ?i ?j))
-       ;(* (count-results '(On o ?i ?j)) -1)
-       ;(* (count-results '(AND (Dva-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.1)
-       ;(* (count-results '(AND (Dva-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.1)
-       ;(* (count-results '(AND (Tri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.25)
-       ;(* (count-results '(AND (Tri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.25)
-       (* (count-results '(AND (Cetri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.85)
-       (* (count-results '(AND (Cetri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.85)
-    )
-    
-    ))
-                     
+    (let ((x2 (count-results '(AND (Dva-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0)))) 
+          (o2 (count-results '(AND (Dva-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))))) 
+       
+    (+ (count-results '(On x ?i ?j))
+       (* (count-results '(On o ?i ?j)) -1)
+       (* x2 0.1)
+       (* o2 -0.1)
+       (if (not (equal x2 0))
+         (+
+           (* (count-results '(AND (Tri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.25)           
+           (* (count-results '(AND (Cetri-u-nizu-x ?i ?j) (!ne ?i 1) (!ne ?i 0))) 0.85)
+         )
+          0)
+       (if (not (equal o2 0))
+         (+          
+           (* (count-results '(AND (Tri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.25)
+           (* (count-results '(AND (Cetri-u-nizu-o ?i ?j) (!ne ?i (- realn 1)) (!ne ?i (- realn 2)))) -0.85)
+         )
+          0)
+       (* (count-results '(MID-OR-FID-x ?i ?j)) 0.1)
+       (* (count-results '(PORED-X ?i ?j)) -0.2)
+       (* (count-results '(PORED-o ?i ?j)) 0.2)
 
+     )
+    )))
+    
+
+
+              
+
+;tesriranje
+(nova 9)
+
+(proc stanje)
+
+(stampaj_tablu (caddr (alphabeta stanje 2 -100 100 t '())))
+(stampaj_tablu (setq stanje (caddr (alphabeta stanje 2 -100 100 t '()))))
+(proc (caddr (alphabeta stanje 2 -100 100 t '())))
+
+(stampaj_tablu (caddr (alphabeta stanje 2 -100 100 '() '())))
+
+
+(proc (caddr (alphabeta stanje 2 -100 100 '() '())))
