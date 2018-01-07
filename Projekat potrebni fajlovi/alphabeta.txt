@@ -1,7 +1,7 @@
 
 (defun alphabeta (m_stanje dubina alpha beta moj-potez roditelj)
     (if (or (zerop dubina) (pobeda m_stanje (figura_comp moj-potez)))
-        (list m_stanje (proc m_stanje) roditelj alpha beta)
+        (list m_stanje (proc m_stanje moj-potez) roditelj alpha beta)
         (if (null moj-potez)
             (min-stanje m_stanje dubina alpha beta moj-potez roditelj (sledbenici m_stanje (figura_comp moj-potez)) (list '() '100))
             (max-stanje m_stanje dubina alpha beta moj-potez roditelj (sledbenici m_stanje (figura_comp moj-potez)) (list '() '-100))

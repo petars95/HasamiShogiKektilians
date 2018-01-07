@@ -91,7 +91,7 @@
                                            (t (cons (list 'On (nth j (nth i tabla)) i j) (napravi_cinjenice tabla i (1+ j)) )) ))
 
 
-(defun proc (tabla)
+(defun proc (tabla igrac)
                      
   (progn (defparameter *T1-FACTS* (napravi_cinjenice tabla 0 0)) (prepare-knowledge *T1-RULES* *T1-FACTS* 10) 
     
@@ -115,8 +115,9 @@
          )
           0)
        (* (count-results '(MID-OR-FID-x ?i ?j)) 0.1)
-       (* (count-results '(PORED-X ?i ?j)) -0.2)
+       (if (null igrac)
        (* (count-results '(PORED-o ?i ?j)) 0.2)
+       (* (count-results '(PORED-X ?i ?j)) -0.2))
 
      )
     )))
@@ -128,13 +129,13 @@
 ;tesriranje
 (nova 9)
 
-(proc stanje)
+(proc stanje '())
 
 (stampaj_tablu (caddr (alphabeta stanje 2 -100 100 t '())))
 (stampaj_tablu (setq stanje (caddr (alphabeta stanje 2 -100 100 t '()))))
-(proc (caddr (alphabeta stanje 2 -100 100 t '())))
+(proc (caddr (alphabeta stanje 2 -100 100 t '())) t)
 
 (stampaj_tablu (caddr (alphabeta stanje 2 -100 100 '() '())))
 
 
-(proc (caddr (alphabeta stanje 2 -100 100 '() '())))
+(proc (caddr (alphabeta stanje 2 -100 100 '() '())) '())
