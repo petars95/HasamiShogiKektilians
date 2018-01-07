@@ -115,13 +115,43 @@
          )
           0)
        (* (count-results '(MID-OR-FID-x ?i ?j)) 0.1)
-       (if (null igrac)
-       (* (count-results '(PORED-o ?i ?j)) 0.2)
-       (* (count-results '(PORED-X ?i ?j)) -0.2))
+       ;(if (null igrac)
+       ;(* (count-results '(PORED-o ?i ?j)) 0.2)
+       ;(* (count-results '(PORED-X ?i ?j)) -0.2))
 
      )
     )))
     
+
+(defun igraj () 
+    (progn 
+
+      (print "Unesite potez:") 
+
+      (setq potez_igraca (read))
+
+      (if  (validan_potez (car potez_igraca) (cadr potez_igraca) stanje trenutniigrac)
+        (progn 
+           (setq stanje (potez (car potez_igraca) (cadr potez_igraca) stanje trenutniigrac))
+           (stampaj_tablu stanje)
+           (setq trenutniigrac (suprotni_igrac trenutniigrac))
+           (values)
+        )
+        (progn (print "NEVALIDAN POTEZ") (igraj))
+        )
+
+      (if (pobeda stanje (suprotni_igrac trenutniigrac)) (format t "POBEDNIK JE ~a~%~%" (suprotni_igrac trenutniigrac))
+      (progn 
+           (setq stanje (caddr (alphabeta stanje 2 -100 100 '() '())))
+           (stampaj_tablu stanje)
+           (if (pobeda stanje trenutniigrac) (format t "POBEDNIK JE ~a~%~%" trenutniigrac))
+           (setq trenutniigrac (suprotni_igrac trenutniigrac))
+           (if (pobeda stanje (suprotni_igrac trenutniigrac)) 
+               (format t "POBEDNIK JE ~a~%~%" (suprotni_igrac trenutniigrac))
+               (igraj))
+        ))
+     )
+ )
 
 
               
@@ -135,7 +165,7 @@
 (stampaj_tablu (setq stanje (caddr (alphabeta stanje 2 -100 100 t '()))))
 (proc (caddr (alphabeta stanje 2 -100 100 t '())) t)
 
-(stampaj_tablu (caddr (alphabeta stanje 2 -100 100 '() '())))
+(stampaj_tablu (setq stanje(caddr (alphabeta stanje 2 -100 100 '() '()))))
 
 
 (proc (caddr (alphabeta stanje 2 -100 100 '() '())) '())
