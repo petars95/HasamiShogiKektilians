@@ -1,0 +1,68 @@
+(defun igraj_x () 
+    (progn 
+
+      (print "Unesite potez za X:") 
+
+      (setq potez_igraca (read))
+
+      (if  (validan_potez (car potez_igraca) (cadr potez_igraca) stanje trenutniigrac)
+        (progn 
+           (setq stanje (potez (car potez_igraca) (cadr potez_igraca) stanje trenutniigrac))
+           (stampaj_tablu stanje)
+           (setq trenutniigrac (suprotni_igrac trenutniigrac))
+           (values)
+        )
+        (progn (print "NEVALIDAN POTEZ") (igraj_x))
+        )
+
+      (if (pobeda stanje (suprotni_igrac trenutniigrac)) (format t "POBEDNIK JE ~a~%~%" (suprotni_igrac trenutniigrac))
+      (progn 
+           (setq stanje (caddr (alphabeta stanje 2 -100 100 '() '())))
+           (stampaj_tablu stanje)
+           (if (pobeda stanje trenutniigrac) (format t "POBEDNIK JE ~a~%~%" trenutniigrac))
+           (setq trenutniigrac (suprotni_igrac trenutniigrac))
+           (if (pobeda stanje (suprotni_igrac trenutniigrac)) 
+               (format t "POBEDNIK JE ~a~%~%" (suprotni_igrac trenutniigrac))
+               (igraj_x))
+        ))
+     )
+ )
+ 
+ 
+ 
+(defun igraj_o () 
+  (progn 
+	
+	(setq stanje (caddr (alphabeta stanje 2 -100 100 t '())))
+    (stampaj_tablu stanje)
+    (setq trenutniigrac (suprotni_igrac trenutniigrac))
+    
+    (if (pobeda stanje (suprotni_igrac trenutniigrac)) (format t "POBEDNIK JE ~a~%~%" (suprotni_igrac trenutniigrac))
+      (progn 
+		(print "Unesite potez za O:") 
+		;(setq nevalidan_potez '())
+		(setq potez_igraca (read))
+		(provera_poteza_o)
+		(setq stanje (potez (car potez_igraca) (cadr potez_igraca) stanje trenutniigrac))
+		(stampaj_tablu stanje)
+		(setq trenutniigrac (suprotni_igrac trenutniigrac))
+	   
+        (if (pobeda stanje (suprotni_igrac trenutniigrac)) 
+            (format t "POBEDNIK JE ~a~%~%" (suprotni_igrac trenutniigrac))
+            (igraj_o))
+      )
+	)
+  )
+)
+
+ 
+ 
+(defun provera_poteza_o () (if (validan_potez (car potez_igraca) (cadr potez_igraca) stanje trenutniigrac) 
+								 potez_igraca 
+							    (progn 
+								 (print "Nevalidan potez. Unesite novi potez za O:")
+								 (setq potez_igraca (read)) 
+								 (provera_poteza_o)
+								)								 
+							)
+)

@@ -59,30 +59,7 @@
 
                            ;mid or fid
                            (IF (AND (ON x ?i ?j) (!eq ?i (=div REALN)) (!eq ?j (=div REALN))    ) THEN (MID-OR-FID-x ?i ?j))
-
-                           ;;lose za x , oduzeti  -0.2
-                           (IF (AND (ON x ?i ?j) (On o (=dec ?i) ?j)) THEN (PORED-X ?i ?j))
-                           (IF (AND (ON x ?i ?j) (On o (=inc ?i) ?j)) THEN (PORED-X ?i ?j))
-                           (IF (AND (ON x ?i ?j) (On o ?i (=dec ?j))) THEN (PORED-X ?i ?j))
-                           (IF (AND (ON x ?i ?j) (On o ?i (=inc ?j))) THEN (PORED-X ?i ?j))
-
-                           (IF (AND (ON x ?i ?j) (On o (=dec ?i) (=dec ?j))) THEN (PORED-X ?i ?j))
-                           (IF (AND (ON x ?i ?j) (On o (=dec ?i) (=inc ?j))) THEN (PORED-X ?i ?j))
-                           (IF (AND (ON x ?i ?j) (On o (=inc ?i) (=inc ?j))) THEN (PORED-X ?i ?j))
-                           (IF (AND (ON x ?i ?j) (On o (=inc ?i) (=dec ?j))) THEN (PORED-X ?i ?j))
-
-                           ;;lose za o. dodati 0.2
-                           (IF (AND (ON o ?i ?j) (On x (=dec ?i) ?j)) THEN (PORED-o ?i ?j))
-                           (IF (AND (ON o ?i ?j) (On x (=inc ?i) ?j)) THEN (PORED-o ?i ?j))
-                           (IF (AND (ON o ?i ?j) (On x ?i (=dec ?j))) THEN (PORED-o ?i ?j))
-                           (IF (AND (ON o ?i ?j) (On x ?i (=inc ?j))) THEN (PORED-o ?i ?j))
-
-                           (IF (AND (ON o ?i ?j) (On x (=dec ?i) (=dec ?j))) THEN (PORED-o ?i ?j))
-                           (IF (AND (ON o ?i ?j) (On x (=dec ?i) (=inc ?j))) THEN (PORED-o ?i ?j))
-                           (IF (AND (ON o ?i ?j) (On x (=inc ?i) (=inc ?j))) THEN (PORED-o ?i ?j))
-                           (IF (AND (ON o ?i ?j) (On x (=inc ?i) (=dec ?j))) THEN (PORED-o ?i ?j))
-
-                         
+                        
 	))
 
 (defun napravi_cinjenice (tabla i j) (cond ((equal i realn) '())
@@ -115,9 +92,6 @@
          )
           0)
        (* (count-results '(MID-OR-FID-x ?i ?j)) 0.1)
-       ;(if (null igrac)
-       ;(* (count-results '(PORED-o ?i ?j)) 0.2)
-       ;(* (count-results '(PORED-X ?i ?j)) -0.2))
 
      )
     )))
