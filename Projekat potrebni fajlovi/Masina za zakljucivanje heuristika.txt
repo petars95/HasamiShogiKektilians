@@ -97,37 +97,6 @@
     )))
     
 
-(defun igraj () 
-    (progn 
-
-      (print "Unesite potez:") 
-
-      (setq potez_igraca (read))
-
-      (if  (validan_potez (car potez_igraca) (cadr potez_igraca) stanje trenutniigrac)
-        (progn 
-           (setq stanje (potez (car potez_igraca) (cadr potez_igraca) stanje trenutniigrac))
-           (stampaj_tablu stanje)
-           (setq trenutniigrac (suprotni_igrac trenutniigrac))
-           (values)
-        )
-        (progn (print "NEVALIDAN POTEZ") (igraj))
-        )
-
-      (if (pobeda stanje (suprotni_igrac trenutniigrac)) (format t "POBEDNIK JE ~a~%~%" (suprotni_igrac trenutniigrac))
-      (progn 
-           (setq stanje (caddr (alphabeta stanje 2 -100 100 '() '())))
-           (stampaj_tablu stanje)
-           (if (pobeda stanje trenutniigrac) (format t "POBEDNIK JE ~a~%~%" trenutniigrac))
-           (setq trenutniigrac (suprotni_igrac trenutniigrac))
-           (if (pobeda stanje (suprotni_igrac trenutniigrac)) 
-               (format t "POBEDNIK JE ~a~%~%" (suprotni_igrac trenutniigrac))
-               (igraj))
-        ))
-     )
- )
-
-
               
 
 ;tesriranje
